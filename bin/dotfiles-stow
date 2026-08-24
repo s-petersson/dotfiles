@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if ! command -v stow >/dev/null 2>&1; then
+  echo "error: GNU stow is required but was not found in PATH" >&2
+  exit 1
+fi
+
+source "$repo/lib/dotfiles/work-repo.sh"
+dotfiles_resolve_work_repo "$repo"
+work_repo="$DOTFILES_RESOLVED_WORK_REPO"
+
+stow_home() {
+  local source_repo="$1"
+  shift
+
+  [ -d "$source_repo/home" ] || return 0
+  stow --no-folding "$@" -d "$source_repo" -t "$HOME" home
+}
+
+# Unstow first so a public link from an earlier run can become a work override.
+if [ -n "$work_repo" ]; then
+  echo "==> Unstowing previous work dotfiles from $work_repo/home"
+  stow_home "$work_repo" -D
+fi
+
+echo "==> Unstowing previous public dotfiles from $repo/home"
+stow_home "$repo" -D
+
+ignore_args=()
+if [ -n "$work_repo" ] && [ -d "$work_repo/home" ]; then
+  while IFS= read -r -d '' file; do
+    relative="${file#"$work_repo/home/"}"
+    escaped="$(printf '%s' "$relative" | sed 's/[][\\.^$*+?(){}|]/\\&/g')"
+    ignore_args+=(--ignore="^${escaped}$")
+  done < <(find "$work_repo/home" \( -type f -o -type l \) -print0)
+fi
+
+echo "==> Stowing public home/ into $HOME"
+stow_home "$repo" "${ignore_args[@]}"
+
+if [ -n "$work_repo" ]; then
+  echo "==> Stowing work home/ from $work_repo into $HOME"
+  stow_home "$work_repo"
+fi

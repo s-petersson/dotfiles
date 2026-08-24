@@ -1,0 +1,48 @@
+# See https://git-scm.com/docs/git-config
+
+[user]
+	name = Simon Petersson
+	email = peterssonaren@gmail.com
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+  cp = "cherry-pick"
+  cane = "commit --amend --no-edit"
+  ca = "commit --amend"
+  rbc = "rebase --continue"
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+[push]
+	autoSetupRemote = true
+  default = current
+[diff]
+	algorithm = histogram
+	colorMoved = plain
+	mnemonicPrefix = true
+[commit]
+	verbose = true
+  template = $HOME/.config/git/template
+[core]
+  autocrlf = input
+  whitespace = error
+  excludesFile = $HOME/git/.config/ignore
+[status]
+  showUntrackedFiles = all
+[column]
+	ui = auto
+[branch]
+	sort = -committerdate
+[tag]
+	sort = -version:refname
+[rerere]
+	enabled = true
+	autoupdate = true
+
+# A private work dotfiles repository can add conditional includes here, for
+# example based on the directory containing a work checkout.
+[include]
+	path = ~/.config/git/includes/*.conf
