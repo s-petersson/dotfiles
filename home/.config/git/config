@@ -26,11 +26,11 @@
 	mnemonicPrefix = true
 [commit]
 	verbose = true
-  template = $HOME/.config/git/template
+  template = ~/.config/git/template
 [core]
   autocrlf = input
   whitespace = error
-  excludesFile = $HOME/git/.config/ignore
+  excludesFile = ~/.config/git/ignore
 [status]
   showUntrackedFiles = all
 [column]
