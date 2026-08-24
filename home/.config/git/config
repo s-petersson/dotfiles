@@ -6,8 +6,9 @@
 [alias]
 	co = checkout
 	br = branch
-	ci = commit
+	c = commit
 	st = status
+  a = add
   cp = "cherry-pick"
   cane = "commit --amend --no-edit"
   ca = "commit --amend"
