@@ -9,6 +9,7 @@
 	c = commit
 	st = status
   a = add
+  p = push
   cp = "cherry-pick"
   cane = "commit --amend --no-edit"
   ca = "commit --amend"
