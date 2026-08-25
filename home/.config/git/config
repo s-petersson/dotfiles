@@ -1,8 +1,7 @@
 # See https://git-scm.com/docs/git-config
 
-[user]
-	name = Simon Petersson
-	email = peterssonaren@gmail.com
+[include]
+	path = ~/.config/git/user.gitconfig
 [alias]
 	co = checkout
 	br = branch
