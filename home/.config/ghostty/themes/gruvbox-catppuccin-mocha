@@ -1,0 +1,37 @@
+background = 1d2021
+foreground = ebdbb2
+cursor-color = ea6962
+selection-background = 404040
+selection-foreground = ebdbb2
+
+# black / bright black
+palette = 0=#404040
+palette = 8=#4d4d4d
+
+# red / bright red
+palette = 1=#ea6962
+palette = 9=#ea6962
+
+# green / bright green
+palette = 2=#a9b665
+palette = 10=#a9b665
+
+# yellow / bright yellow
+palette = 3=#d8a657
+palette = 11=#d8a657
+
+# blue / bright blue
+palette = 4=#7daea3
+palette = 12=#7daea3
+
+# magenta / bright magenta
+palette = 5=#d3869b
+palette = 13=#d3869b
+
+# cyan / bright cyan
+palette = 6=#89b482
+palette = 14=#89b482
+
+# white / bright white
+palette = 7=#d5c4a1
+palette = 15=#ebdbb2

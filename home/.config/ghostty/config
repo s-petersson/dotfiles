@@ -1,0 +1,15 @@
+theme = gruvbox-catppuccin-mocha
+# background = #181825
+window-decoration = none
+window-padding-x = 8
+window-padding-y = 8
+window-padding-balance = true
+# macos-titlebar-style = hidden
+# background-opacity = 0.8
+cursor-style = block
+# font-family = JetBrainsMono Nerd Font Mono
+# font-family = Iosevka Term
+font-size = 12
+# font-family = Fira Code
+adjust-cell-height = 20%
+custom-shader = "~/.config/ghostty/cursor-warp.glsl"
