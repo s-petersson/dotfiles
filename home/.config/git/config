@@ -7,43 +7,55 @@
 	br = branch
 	c = commit
 	st = status
-  a = add
-  p = push
-  cp = "cherry-pick"
-  cane = "commit --amend --no-edit"
-  ca = "commit --amend"
-  rbc = "rebase --continue"
+	a = add
+	p = push
+	cp = "cherry-pick"
+	cane = "commit --amend --no-edit"
+	ca = "commit --amend"
+	rbc = "rebase --continue"
+    lg = "log --graph"
+    wip = "! git add . && git commit -m \"~wip~\""
+    unwip = "! git reset HEAD~ --soft && git restore --staged ."
 [init]
 	defaultBranch = main
 [pull]
 	rebase = true
 [push]
 	autoSetupRemote = true
-  default = current
+	default = current
 [diff]
 	algorithm = histogram
 	colorMoved = plain
 	mnemonicPrefix = true
 [commit]
 	verbose = true
-  template = ~/.config/git/template
+	template = ~/.config/git/template
 [core]
-  autocrlf = input
-  whitespace = error
-  excludesFile = ~/.config/git/ignore
+	autocrlf = input
+	whitespace = error
 [status]
-  showUntrackedFiles = all
+	showUntrackedFiles = all
 [column]
 	ui = auto
 [branch]
 	sort = -committerdate
 [tag]
 	sort = -version:refname
+[log]
+	graph = true
+	abbrevCommit = true
+	; graphColors = blue,yellow,cyan,magenta,green,red
 [rerere]
 	enabled = true
 	autoupdate = true
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
 
 # A private work dotfiles repository can add conditional includes here, for
 # example based on the directory containing a work checkout.
 [include]
-	path = ~/.config/git/includes/*.conf
+	path = ~/.config/git/work-overrides.gitconfig
