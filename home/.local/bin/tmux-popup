@@ -1,0 +1,12 @@
+#!/bin/sh
+
+id=${2:}
+
+width=${3:-80%}
+height=${3:-80%}
+
+if [ "$(tmux display-message -p -F "#{session_name}")" = "popup" ];then
+    tmux detach-client
+else
+    tmux popup -d '#{pane_current_path}-${id}' -xC -yC -w$width -h$height -E "tmux attach -t popup || tmux new -s popup"
+fi
