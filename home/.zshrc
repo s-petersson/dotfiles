@@ -26,6 +26,7 @@ source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 eval "$(starship init zsh)"
 eval "$(fnm env)"
 eval "$(zoxide init zsh)"
+source <(fzf --zsh)
 
 alias pi="PI_HARDWARE_CURSOR=1 pi"
 alias vim=nvim
