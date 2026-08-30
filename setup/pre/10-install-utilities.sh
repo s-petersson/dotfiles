@@ -16,4 +16,7 @@ dotfiles_install_packages \
     fnm \
     uv \
     eza \
-    bat
+    bat \
+    --arch ghostty
+
+dotfiles_install_homebrew_casks ghostty

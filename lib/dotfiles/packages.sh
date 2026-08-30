@@ -7,6 +7,7 @@
 #   source "${DOTFILES_LIB:?}/packages.sh"
 #   dotfiles_install_packages <package_name>...
 #   dotfiles_install_packages --macos <package_name>... --arch <package_name>...
+#   dotfiles_install_homebrew_casks <cask_name>...
 #
 # Platform selectors apply to every package that follows, up to the next
 # selector. Unqualified packages are installed on both supported platforms.
@@ -17,6 +18,22 @@ fi
 DOTFILES_PACKAGES_SH_LOADED=1
 
 source "${DOTFILES_LIB:?}/platform.sh"
+
+dotfiles_install_homebrew_casks() {
+  if ! dotfiles_is_macos || [ "$#" -eq 0 ]; then
+    return 0
+  fi
+
+  local missing_casks=()
+  local cask
+  for cask in "$@"; do
+    brew list --cask --versions "$cask" >/dev/null 2>&1 || missing_casks+=("$cask")
+  done
+
+  if [ "${#missing_casks[@]}" -gt 0 ]; then
+    brew install --cask "${missing_casks[@]}"
+  fi
+}
 
 dotfiles_install_packages() {
   if [ "$#" -eq 0 ]; then
