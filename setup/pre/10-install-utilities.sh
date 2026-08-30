@@ -17,8 +17,10 @@ dotfiles_install_packages \
     eza \
     bat \
     --macos FelixKratz/formulae/borders \
-    --arch ghostty
+    --arch ghostty \
+    obsidian
 
 dotfiles_install_homebrew_casks \
     ghostty \
-    nikitabobko/tap/aerospace
+    nikitabobko/tap/aerospace \
+    obsidian

@@ -9,5 +9,4 @@ These are applications & utilities that I use but have yet to configure in this 
 - nct6687d kernel driver (manual build and install) (https://github.com/Fred78290/nct6687d)
 
 ## Shared
-- Obsidian
 - tuicr
