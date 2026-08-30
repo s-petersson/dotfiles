@@ -7,4 +7,5 @@ dotfiles_install_packages \
     stow \
     fzf \
     neovim \
-    starship
+    starship \
+    fnm
