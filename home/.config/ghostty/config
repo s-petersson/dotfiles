@@ -5,7 +5,7 @@ config-file = ?"~/.local/state/dotfiles/theme/current/ghostty.conf"
 config-file = ?"platform.conf"
 
 # Attach to the most recently used tmux session, or create one
-command = sh -c 'tmux attach-session || tmux new-session; exec "$SHELL" -l'
+command = zsh -lc 'tmux attach-session || tmux new-session; exec "$SHELL" -l'
 
 font-size = 12
 adjust-cell-height = 20%
