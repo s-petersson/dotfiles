@@ -73,6 +73,17 @@ DOTFILES_WORK_REPO= dot install
 
 The work repository's setup scripts receive `DOTFILES_REPO` pointing to the work repository and `DOTFILES_LIB` pointing to the shared helpers in this public repository.
 
+## Themes
+
+Shared Ghostty, tmux, Neovim, and Starship colors can be switched on macOS and Omarchy:
+
+```sh
+dot theme choose
+dot theme set gruvbox
+```
+
+On Omarchy, selections from the native theme switcher also update the shared tools. See [`docs/theming.md`](docs/theming.md) for the palette format and instructions for adding themes or tools.
+
 ## Setup scripts
 
 Put imperative setup in `setup/pre/` or `setup/post/`. Scripts must be safe to re-run and should avoid destructive changes.

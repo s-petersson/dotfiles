@@ -2,31 +2,25 @@ add_newline = false
 
 command_timeout = 3000
 
-# A minimal left prompt
 format = """
 $directory\
 $git_branch \
 $git_commit\
-$git_state\
-$fill\
+$git_state
 $character\
 """
 
-[fill]
-symbol = " "
-
 [character]
-vicmd_symbol = " [\\[N\\] ➜](blue)"
-success_symbol = " [\\[I\\] ➜](green)"
+success_symbol = " [➜](green)"
 
 [directory]
 format = '[   $path]($style) [$read_only]($read_only_style) '
 read_only = "󰌾"
-style = "surface2"
+style = "blue"
 
 [git_branch]
 format = '[$symbol$branch(:$remote_branch)]($style)'
-style = 'mauve'
+style = 'purple'
 
 [git_commit]
 style = "green"

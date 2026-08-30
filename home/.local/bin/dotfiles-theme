@@ -1,0 +1,289 @@
+#!/bin/sh
+# List, choose, and apply shared themes with `dotfiles-theme COMMAND` or `dot theme COMMAND`.
+set -eu
+
+config_home=${XDG_CONFIG_HOME:-"$HOME/.config"}
+state_home=${XDG_STATE_HOME:-"$HOME/.local/state"}
+themes_dir="$config_home/dotfiles/themes"
+templates_dir="$config_home/dotfiles/theme-templates"
+state_dir="$state_home/dotfiles/theme"
+
+usage() {
+  cat <<'EOF'
+usage: dotfiles-theme <command> [theme]
+
+Commands:
+  list             List available themes
+  current          Print the current theme
+  choose           Choose a theme with fzf
+  set <theme>      Select a theme
+EOF
+}
+
+slugify() {
+  printf '%s' "$1" | tr '[:upper:] ' '[:lower:]-' | sed 's/[^a-z0-9-]//g'
+}
+
+is_omarchy() {
+  [ "$(uname -s)" = Linux ] && command -v omarchy >/dev/null 2>&1
+}
+
+list_themes() {
+  if is_omarchy; then
+    omarchy theme list
+    return
+  fi
+
+  [ -d "$themes_dir" ] || return 0
+  for theme_path in "$themes_dir"/*; do
+    [ -d "$theme_path" ] || continue
+    basename "$theme_path"
+  done | sort
+}
+
+current_theme() {
+  if [ -f "$state_dir/current.name" ]; then
+    cat "$state_dir/current.name"
+  elif is_omarchy; then
+    omarchy theme current
+  else
+    echo "No dotfiles theme has been selected" >&2
+    return 1
+  fi
+}
+
+theme_source() {
+  theme=$1
+  repo_theme="$themes_dir/$theme/colors.toml"
+  user_omarchy_theme="$config_home/omarchy/themes/$theme/colors.toml"
+  stock_omarchy_theme="${OMARCHY_PATH:-/usr/share/omarchy}/themes/$theme/colors.toml"
+  current_omarchy_theme="$state_home/omarchy/current/theme/colors.toml"
+  current_omarchy_name="$state_home/omarchy/current/theme.name"
+
+  if [ -f "$repo_theme" ]; then
+    printf '%s\n' "$repo_theme"
+  elif [ -f "$user_omarchy_theme" ]; then
+    printf '%s\n' "$user_omarchy_theme"
+  elif [ -f "$stock_omarchy_theme" ]; then
+    printf '%s\n' "$stock_omarchy_theme"
+  elif [ -f "$current_omarchy_theme" ] && [ -f "$current_omarchy_name" ] && [ "$(cat "$current_omarchy_name")" = "$theme" ]; then
+    printf '%s\n' "$current_omarchy_theme"
+  else
+    echo "Theme '$theme' has no colors.toml" >&2
+    return 1
+  fi
+}
+
+theme_value() {
+  key=$1
+  file=$2
+  awk -F= -v wanted="$key" '
+    {
+      name = $1
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", name)
+      if (name != wanted) next
+
+      value = substr($0, index($0, "=") + 1)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+      if (value ~ /^".*"$/) value = substr(value, 2, length(value) - 2)
+      print value
+      found = 1
+      exit
+    }
+    END { if (!found) exit 1 }
+  ' "$file"
+}
+
+build_palette() {
+  source_file=$1
+  output=$2
+  keys='accent selection muted background dark_background darker_background lighter_background foreground dark_foreground light_foreground bright_foreground red yellow orange green cyan blue magenta brown bright_red bright_yellow bright_green bright_cyan bright_blue bright_magenta'
+
+  mode=$(theme_value mode "$source_file") || {
+    echo "Theme is missing required value 'mode': $source_file" >&2
+    return 1
+  }
+  case $mode in
+    dark | light) ;;
+    *)
+      echo "Theme mode must be 'dark' or 'light': $mode" >&2
+      return 1
+      ;;
+  esac
+
+  printf 'mode\t%s\n' "$mode" >"$output"
+  for key in $keys; do
+    if ! value=$(theme_value "$key" "$source_file"); then
+      case $key in
+        orange) value=$(theme_value red "$source_file") ;;
+        brown) value=$(theme_value dark_foreground "$source_file") ;;
+        *)
+          echo "Theme is missing required color '$key': $source_file" >&2
+          return 1
+          ;;
+      esac
+    fi
+    case $value in
+      \#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]) ;;
+      *)
+        echo "Theme color '$key' is not a six-digit hex color: $value" >&2
+        return 1
+        ;;
+    esac
+    printf '%s\t%s\n' "$key" "$value" >>"$output"
+  done
+}
+
+render_templates() {
+  palette=$1
+  destination=$2
+  sed_script="$destination/substitutions.sed"
+
+  : >"$sed_script"
+  while IFS="	" read -r key value; do
+    printf 's|{{ %s }}|%s|g\n' "$key" "$value" >>"$sed_script"
+  done <"$palette"
+
+  for template in "$templates_dir"/*.tpl; do
+    [ -f "$template" ] || continue
+    output="$destination/$(basename "$template" .tpl)"
+    sed -f "$sed_script" "$template" >"$output"
+    if grep -q '{{.*}}' "$output"; then
+      echo "Template has an unknown color token: $template" >&2
+      return 1
+    fi
+  done
+  rm "$sed_script"
+}
+
+activate_generation() {
+  theme=$1
+  generation=$2
+  link="$state_dir/.current.$$"
+  name="$state_dir/.current.name.$$"
+  old_target=$(readlink "$state_dir/current" 2>/dev/null || true)
+
+  ln -s "generated/$(basename "$generation")" "$link"
+  rm -f "$state_dir/current"
+  mv "$link" "$state_dir/current"
+  printf '%s\n' "$theme" >"$name"
+  mv -f "$name" "$state_dir/current.name"
+
+  case $old_target in
+    generated/*)
+      [ "$state_dir/$old_target" = "$generation" ] || rm -rf "$state_dir/$old_target"
+      ;;
+  esac
+}
+
+reload_apps() {
+  if command -v tmux >/dev/null 2>&1 && tmux list-sessions >/dev/null 2>&1; then
+    tmux source-file "$config_home/tmux/tmux.conf"
+  fi
+
+  if command -v pkill >/dev/null 2>&1; then
+    pkill -USR2 -x ghostty 2>/dev/null || true
+    pkill -USR2 -x Ghostty 2>/dev/null || true
+    pkill -USR1 -x nvim 2>/dev/null || true
+  fi
+}
+
+cleanup_apply() {
+  [ -z "${temporary:-}" ] || rm -rf "$temporary"
+  [ -z "${apply_lock:-}" ] || rm -f "$apply_lock"
+}
+
+acquire_apply_lock() {
+  apply_lock="$state_dir/apply.lock"
+  while ! ln -s "$$" "$apply_lock" 2>/dev/null; do
+    lock_pid=$(readlink "$apply_lock" 2>/dev/null || true)
+    if [ -n "$lock_pid" ] && ! kill -0 "$lock_pid" 2>/dev/null; then
+      rm -f "$apply_lock"
+      continue
+    fi
+    sleep 0.1
+  done
+}
+
+apply_theme() {
+  theme=$(slugify "$1")
+  [ -n "$theme" ] || {
+    echo "Invalid empty theme name" >&2
+    return 1
+  }
+  source_file=$(theme_source "$theme")
+
+  mkdir -p "$state_dir/generated"
+  apply_lock=
+  temporary=
+  acquire_apply_lock
+  trap cleanup_apply EXIT HUP INT TERM
+  temporary=$(mktemp -d "$state_dir/.render.XXXXXX")
+
+  build_palette "$source_file" "$temporary/colors"
+  render_templates "$temporary/colors" "$temporary"
+  cp "$source_file" "$temporary/colors.toml"
+  rm "$temporary/colors"
+
+  generation="$state_dir/generated/$theme.$$"
+  mv "$temporary" "$generation"
+  temporary=
+  activate_generation "$theme" "$generation"
+  rm -f "$apply_lock"
+  apply_lock=
+  trap - EXIT HUP INT TERM
+
+  if [ "${DOTFILES_THEME_NO_RELOAD:-0}" != 1 ]; then
+    reload_apps
+  fi
+  printf 'Applied theme: %s\n' "$theme"
+}
+
+set_theme() {
+  [ "$#" -eq 1 ] || {
+    usage >&2
+    return 2
+  }
+
+  if is_omarchy && [ "${DOTFILES_THEME_OMARCHY_HOOK:-0}" != 1 ]; then
+    omarchy theme set "$1"
+  else
+    apply_theme "$1"
+  fi
+}
+
+choose_theme() {
+  command -v fzf >/dev/null 2>&1 || {
+    echo "dotfiles-theme choose requires fzf" >&2
+    return 1
+  }
+  selection=$(list_themes | fzf --prompt='Theme> ' --height=40% --reverse) || return 0
+  set_theme "$selection"
+}
+
+command=${1:-}
+case $command in
+  list)
+    [ "$#" -eq 1 ] || { usage >&2; exit 2; }
+    list_themes
+    ;;
+  current)
+    [ "$#" -eq 1 ] || { usage >&2; exit 2; }
+    current_theme
+    ;;
+  choose)
+    [ "$#" -eq 1 ] || { usage >&2; exit 2; }
+    choose_theme
+    ;;
+  set)
+    shift
+    set_theme "$@"
+    ;;
+  -h | --help | help)
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

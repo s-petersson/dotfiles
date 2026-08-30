@@ -43,6 +43,7 @@ dotfiles_platform
 
 ## Agent guidance
 
+- Theming: read `docs/theming.md` before adding a theme or theming another tool.
 - Prefer editing files under `home/` instead of directly editing `$HOME`.
 - Keep secrets and machine-specific private values out of the repo.
 - Prefer minimal, targeted edits.

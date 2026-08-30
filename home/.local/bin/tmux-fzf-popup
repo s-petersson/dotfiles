@@ -6,7 +6,7 @@ option() {
   tmux show-option -gqv "$1"
 }
 
-bg=$(option @theme_bg)
+bg=$(option @theme_mantle)
 fg=$(option @theme_fg)
 surface=$(option @theme_surface)
 mantle=$(option @theme_mantle)

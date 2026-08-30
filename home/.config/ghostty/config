@@ -1,6 +1,7 @@
 # Static fallback, overridden by Omarchy when available
 theme = gruvbox-catppuccin-mocha
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
+config-file = ?"~/.local/state/dotfiles/theme/current/ghostty.conf"
 
 # Start zsh in new terminal windows instead of the account's login shell
 command = zsh

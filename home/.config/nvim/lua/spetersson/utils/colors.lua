@@ -58,4 +58,22 @@ M.latte = {
     crust     = '#e8e3c8',
 }
 
+local fallback = M.mocha
+local state_home = vim.env.XDG_STATE_HOME or vim.fn.expand('~/.local/state')
+local generated_palette = state_home .. '/dotfiles/theme/current/neovim.lua'
+
+function M.reload()
+    local ok, theme = pcall(dofile, generated_palette)
+    if not ok or type(theme) ~= 'table' or type(theme.colors) ~= 'table' then
+        M.mocha = fallback
+        return false
+    end
+
+    vim.o.background = theme.mode
+    M.mocha = theme.colors
+    return true
+end
+
+M.reload()
+
 return M

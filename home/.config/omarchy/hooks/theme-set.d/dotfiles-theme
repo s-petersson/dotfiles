@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+
+DOTFILES_THEME_OMARCHY_HOOK=1 dotfiles-theme set "$1"

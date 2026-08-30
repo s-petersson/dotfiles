@@ -1,6 +1,7 @@
 {
   "tuiMode": "fullscreen",
-  "theme": "dark",
+  "theme": "dotfiles",
+  "themes": ["~/.local/state/dotfiles/theme/current/pi.json"],
   "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "medium",
   "defaultProvider": "openai-codex",
