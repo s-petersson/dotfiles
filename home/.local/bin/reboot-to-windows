@@ -1,0 +1,96 @@
+#!/bin/sh
+set -eu
+
+usage() {
+  cat <<'EOF'
+usage: reboot-to-windows [--no-reboot] [--list] [entry-pattern]
+
+Temporarily sets the UEFI BootNext entry to Windows and reboots.
+
+Arguments:
+  entry-pattern  Text to match in efibootmgr output (default: Windows Boot Manager)
+
+Options:
+  -n, --no-reboot  Set BootNext, but do not reboot
+  -l, --list       Show UEFI boot entries and exit
+  -h, --help       Show this help
+EOF
+}
+
+pattern='Windows Boot Manager'
+no_reboot=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -n|--no-reboot)
+      no_reboot=1
+      shift
+      ;;
+    -l|--list)
+      command -v efibootmgr >/dev/null 2>&1 || {
+        echo 'error: efibootmgr is required' >&2
+        exit 1
+      }
+      sudo efibootmgr
+      exit 0
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      [ "$#" -eq 0 ] || pattern=$*
+      break
+      ;;
+    -* )
+      echo "error: unknown option: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+    *)
+      pattern=$*
+      break
+      ;;
+  esac
+done
+
+command -v efibootmgr >/dev/null 2>&1 || {
+  echo 'error: efibootmgr is required' >&2
+  exit 1
+}
+command -v sudo >/dev/null 2>&1 || {
+  echo 'error: sudo is required' >&2
+  exit 1
+}
+
+boot_entries=$(sudo efibootmgr)
+
+boot_num=$(
+  printf '%s\n' "$boot_entries" | awk -v pattern="$pattern" '
+    BEGIN { pattern = tolower(pattern) }
+    $0 ~ /^Boot[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]/ && index(tolower($0), pattern) {
+      print substr($1, 5, 4)
+      exit
+    }
+  '
+)
+
+if [ -z "$boot_num" ]; then
+  echo "error: no UEFI boot entry matched: $pattern" >&2
+  echo >&2
+  echo 'Available boot entries:' >&2
+  printf '%s\n' "$boot_entries" | awk '$0 ~ /^Boot[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]/ { print "  " $0 }' >&2
+  exit 1
+fi
+
+echo "Setting one-time UEFI BootNext to Boot$boot_num ($pattern)"
+sudo efibootmgr --bootnext "$boot_num" >/dev/null
+
+if [ "$no_reboot" -eq 1 ]; then
+  echo 'BootNext set; not rebooting because --no-reboot was given.'
+  exit 0
+fi
+
+echo 'Rebooting into Windows...'
+sudo systemctl reboot
