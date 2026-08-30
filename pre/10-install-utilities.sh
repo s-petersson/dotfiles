@@ -7,7 +7,6 @@ if dotfiles_is_macos; then
 fi
 
 dotfiles_install_packages \
-    curl \
     openssh \
     zsh \
     zsh-autosuggestions \
@@ -23,7 +22,8 @@ dotfiles_install_packages \
     bat \
     tuicr \
     --macos FelixKratz/formulae/borders \
-    --arch ghostty \
+    --arch curl \
+    ghostty \
     obsidian
 
 dotfiles_install_homebrew_casks \
