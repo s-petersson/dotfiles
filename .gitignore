@@ -1,0 +1,10 @@
+# Secrets
+home/.config/.env.secret
+
+# SSH private material
+home/.ssh/id_*
+home/.ssh/*.pem
+home/.ssh/*.key
+
+# Private SSH host configuration
+home/.ssh/config.d/*.private.conf
