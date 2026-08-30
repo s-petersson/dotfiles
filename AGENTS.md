@@ -21,6 +21,8 @@ Personal dotfiles repo. Keep changes simple, idempotent, and low-risk.
 
 ## Setup conventions
 
+- Put shared home files in `home/` and OS-only additions in `platform/<macos|arch>/home/`. `dot stow` selects the platform with `dotfiles_platform`.
+- Keep platform trees additive: a platform file must not replace the same path under `home/`. For differing application settings, make the shared config optionally load a platform-only fragment.
 - Name setup scripts with numeric prefixes: `10-*`, `20-*`, `30-*`.
 - Use intermediate numbers like `15-*` only when inserting between phases.
 - Setup scripts must be safe to re-run and avoid destructive changes.

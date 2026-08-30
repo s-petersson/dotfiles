@@ -10,6 +10,7 @@ while [ -L "$script" ]; do
 done
 repo="$(cd "$(dirname "$script")" && pwd)"
 
+source "$repo/lib/dotfiles/platform.sh"
 source "$repo/lib/dotfiles/private-repo.sh"
 dotfiles_resolve_private_repo "$repo"
 private_repo="$DOTFILES_RESOLVED_PRIVATE_REPO"
@@ -77,6 +78,15 @@ stow_home() {
   stow --no-folding "$@" -d "$source_repo" -t "$HOME" home
 }
 
+unstow_platform_homes() {
+  local platform_repo
+
+  for platform_repo in "$repo"/platform/*; do
+    [ -d "$platform_repo/home" ] || continue
+    stow_home "$platform_repo" -D
+  done
+}
+
 stow_dotfiles() {
   if ! command -v stow >/dev/null 2>&1; then
     echo "error: GNU stow is required but was not found in PATH" >&2
@@ -89,6 +99,7 @@ stow_dotfiles() {
   fi
 
   echo "==> Unstowing previous public dotfiles from $repo/home"
+  unstow_platform_homes
   stow_home "$repo" -D
 
   local ignore_args=()
@@ -108,6 +119,17 @@ stow_dotfiles() {
     stow_home "$repo" "${ignore_args[@]}"
   else
     stow_home "$repo"
+  fi
+
+  local platform
+  platform=$(dotfiles_platform)
+  if [ -d "$repo/platform/$platform/home" ]; then
+    echo "==> Stowing $platform home files into $HOME"
+    if [ "$has_ignore_args" -eq 1 ]; then
+      stow_home "$repo/platform/$platform" "${ignore_args[@]}"
+    else
+      stow_home "$repo/platform/$platform"
+    fi
   fi
 
   if [ -n "$private_repo" ]; then
