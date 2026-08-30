@@ -1,4 +1,4 @@
-local CHARS = require('spetersson.utils.chars')
+-- local CHARS = require('spetersson.utils.chars')
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -83,23 +83,15 @@ vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 vim.opt.splitbelow = true -- horizontal splits go below
 vim.opt.splitright = true -- vertical splits go right
 
--- thicker window separators
 vim.opt.fillchars = {
     eob = ' ',
     diff = '╱',
-    vert = CHARS.right_thick,
-    vertleft = CHARS.right_thick,
-    vertright = CHARS.right_thick,
-    verthoriz = CHARS.right_thick,
-    horiz = CHARS.bottom_thin,
-    horizup = CHARS.bottom_right_thin,
-    -- horiz = '━',
-    -- horizup = '┻',
-    -- horizdown = '┳',
-    -- vert = '┃',
-    -- vertleft = '┫',
-    -- vertright = '┣',
-    -- verthoriz = '╋',
+    -- vert = CHARS.right_thick,
+    -- vertleft = CHARS.right_thick,
+    -- vertright = CHARS.right_thick,
+    -- verthoriz = CHARS.right_thick,
+    -- horiz = CHARS.bottom_thin,
+    -- horizup = CHARS.bottom_right_thin,
 }
 vim.opt.fillchars:append({ diff = ' ' }) -- use blank instead of strikethrough in diffs
 

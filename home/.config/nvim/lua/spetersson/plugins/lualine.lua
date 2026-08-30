@@ -38,12 +38,6 @@ require('lualine').setup({
                 separator = { left = '', right = '' },
             },
             { 'mode' },
-            {
-                function() return CHARS.top_left_triangle end,
-                color = { fg = COLORS.mocha.surface0, bg = COLORS.mocha.mantle },
-                padding = 0,
-                separator = { left = '', right = '' },
-            },
         },
         lualine_b = {},
         lualine_c = {
@@ -96,12 +90,6 @@ require('lualine').setup({
         },
         lualine_y = {},
         lualine_z = {
-            {
-                function() return CHARS.top_left_triangle end,
-                color = { fg = COLORS.mocha.mantle, bg = COLORS.mocha.surface0 },
-                padding = 0,
-                separator = { left = '', right = '' },
-            },
             {
                 'location',
                 color = { fg = COLORS.mocha.text },
