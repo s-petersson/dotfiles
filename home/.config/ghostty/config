@@ -3,8 +3,8 @@ theme = gruvbox-catppuccin-mocha
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
 config-file = ?"~/.local/state/dotfiles/theme/current/ghostty.conf"
 
-# Start zsh in new terminal windows instead of the account's login shell
-command = zsh
+# Attach to the most recently used tmux session, or create one
+command = sh -c 'tmux attach-session || tmux new-session; exec "$SHELL" -l'
 
 font-size = 9
 adjust-cell-height = 20%
