@@ -77,7 +77,7 @@ map('n', '<C-S-k>', '<cmd>resize -2<CR>', { desc = 'Shrink split height' })
 map('n', '<C-S-l>', '<cmd>vertical resize +2<CR>', { desc = 'Grow split width' })
 
 -- Window management
--- map('n', '<leader>wq', '<C-w>q', { desc = 'Close window' })
+map('n', '<leader>wq', '<C-w>q', { desc = 'Close window' })
 -- map('n', '<leader>wv', '<C-w>v', { desc = 'Split window vertically' })
 -- map('n', '<leader>wh', '<C-w>s', { desc = 'Split window horizontally' })
 -- map('n', '<leader>wH', '<C-w>H', { desc = 'Swap window left' })
