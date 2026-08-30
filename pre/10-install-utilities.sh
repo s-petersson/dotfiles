@@ -16,6 +16,7 @@ dotfiles_install_packages \
     fzf \
     neovim \
     starship \
+    zoxide \
     fnm \
     uv \
     eza \
