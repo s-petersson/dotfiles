@@ -10,4 +10,5 @@ dotfiles_install_packages \
     starship \
     fnm \
     uv \
-    eza
+    eza \
+    bat
