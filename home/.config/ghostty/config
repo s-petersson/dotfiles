@@ -2,7 +2,10 @@
 theme = gruvbox-catppuccin-mocha
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
 
-font-size = 12
+# Start zsh in new terminal windows instead of the account's login shell
+command = zsh
+
+font-size = 9
 adjust-cell-height = 20%
 
 window-decoration = none
@@ -14,6 +17,7 @@ resize-overlay = never
 shell-integration-features = no-cursor,ssh-env
 custom-shader = "~/.config/ghostty/cursor-warp.glsl"
 
-# Let TUIs distinguish modified Enter keys
+# Let TUIs distinguish modified keys
 keybind = shift+enter=csi:13;2u
 keybind = alt+shift+enter=csi:13;4u
+keybind = ctrl+shift+j=unbind
