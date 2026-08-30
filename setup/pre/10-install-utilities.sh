@@ -8,4 +8,5 @@ dotfiles_install_packages \
     fzf \
     neovim \
     starship \
-    fnm
+    fnm \
+    uv
