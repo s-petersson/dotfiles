@@ -3,7 +3,6 @@
 These are applications & utilities that I use but have yet to configure in this repository. When items on this list are added to the repo and configured, they should be removed from this list.
 
 ## MacOS 
-- Xcode Command Line Tools
 - Aerospace
 - JankyBorders
 
