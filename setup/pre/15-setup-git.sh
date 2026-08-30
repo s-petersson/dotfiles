@@ -6,7 +6,7 @@ source "${DOTFILES_LIB:?}/prompt.sh"
 
 dotfiles_backup_file "$HOME/.config/git/config"
 
-dotfiles_install_packages git openssh --macos gh --arch github-cli
+dotfiles_install_packages git --macos gh --arch github-cli
 
 personal_git_config="$DOTFILES_REPO/home/.config/git/config"
 github_email="$(git config --file "$personal_git_config" --get user.email)"
