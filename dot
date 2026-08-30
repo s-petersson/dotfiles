@@ -92,17 +92,23 @@ stow_dotfiles() {
   stow_home "$repo" -D
 
   local ignore_args=()
+  local has_ignore_args=0
   if [ -n "$private_repo" ] && [ -d "$private_repo/home" ]; then
     local file relative escaped
     while IFS= read -r -d '' file; do
       relative="${file#"$private_repo/home/"}"
       escaped="$(printf '%s' "$relative" | sed 's/[][\\.^$*+?(){}|]/\\&/g')"
       ignore_args+=(--ignore="^${escaped}$")
+      has_ignore_args=1
     done < <(find "$private_repo/home" \( -type f -o -type l \) -print0)
   fi
 
   echo "==> Stowing public home/ into $HOME"
-  stow_home "$repo" "${ignore_args[@]}"
+  if [ "$has_ignore_args" -eq 1 ]; then
+    stow_home "$repo" "${ignore_args[@]}"
+  else
+    stow_home "$repo"
+  fi
 
   if [ -n "$private_repo" ]; then
     echo "==> Stowing private home/ from $private_repo into $HOME"
