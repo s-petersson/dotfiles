@@ -2,6 +2,10 @@
 
 source "${DOTFILES_LIB:?}/packages.sh"
 
+if dotfiles_is_macos; then
+    brew tap FelixKratz/formulae
+fi
+
 dotfiles_install_packages \
     curl \
     openssh \
