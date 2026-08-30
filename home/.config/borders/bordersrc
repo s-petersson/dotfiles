@@ -10,7 +10,7 @@ fi
 
 options=(
   style=round
-  width=4.0
+  width=6.0
   hidpi=on
   "active_color=$active_color"
   "inactive_color=$inactive_color"
