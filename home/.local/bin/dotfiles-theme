@@ -177,6 +177,10 @@ activate_generation() {
 }
 
 reload_apps() {
+  if command -v borders >/dev/null 2>&1 && pgrep -x borders >/dev/null 2>&1; then
+    "$config_home/borders/bordersrc"
+  fi
+
   if command -v tmux >/dev/null 2>&1 && tmux list-sessions >/dev/null 2>&1; then
     tmux source-file "$config_home/tmux/tmux.conf"
   fi

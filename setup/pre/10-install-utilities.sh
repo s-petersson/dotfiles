@@ -16,6 +16,7 @@ dotfiles_install_packages \
     uv \
     eza \
     bat \
+    --macos FelixKratz/formulae/borders \
     --arch ghostty
 
 dotfiles_install_homebrew_casks \
