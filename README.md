@@ -8,8 +8,7 @@ Personal dotfiles managed with GNU stow plus small idempotent setup scripts.
 .
 ├── AGENTS.md
 ├── README.md
-├── bin/
-│   └── ... commands for installing and managing the dotfiles ...
+├── dot
 ├── home/
 │   └── ... files mirroring $HOME ...
 ├── lib/
@@ -23,14 +22,14 @@ Personal dotfiles managed with GNU stow plus small idempotent setup scripts.
 
 The `home/` directory mirrors paths relative to `$HOME`.
 
-The `bin/` directory contains the command entry points. `dot` dispatches user-facing commands, `dotfiles-setup` runs the public and private setup phases, and `dotfiles-stow` manages the GNU stow links and private overrides.
+The root-level `dot` command runs setup phases and manages GNU stow links and private overrides.
 
-The `lib/dotfiles/` directory contains shell functions sourced by those commands and by setup scripts. They handle file backups, package installation, platform detection, private repository discovery, and confirmation prompts.
+The `lib/dotfiles/` directory contains shell functions sourced by `dot` and by setup scripts. They handle file backups, package installation, platform detection, private repository discovery, and confirmation prompts.
 
 ## Usage
 
 ```sh
-./bin/dot install
+./dot install
 ```
 
 After the first install, `dot` is available on `PATH`:

@@ -4,8 +4,8 @@ Personal dotfiles repo. Keep changes simple, idempotent, and low-risk.
 
 ## Layout
 
+- `dot` is the repository command for installation and setup.
 - `home/` mirrors `$HOME` and is managed with GNU stow.
-- `bin/` contains helper commands.
 - `lib/dotfiles/` contains reusable shell helpers.
 - `pre/` contains setup scripts that run before stow.
 - `post/` contains setup scripts that run after stow.
@@ -13,10 +13,10 @@ Personal dotfiles repo. Keep changes simple, idempotent, and low-risk.
 ## Commands
 
 ```sh
-./bin/dot install             # pre setup, stow, post setup
-./bin/dot pre                 # run pre-stow setup
-./bin/dot stow                # stow home/ into $HOME
-./bin/dot post                # run post-stow setup
+./dot install                 # pre setup, stow, post setup
+./dot pre                     # run pre-stow setup
+./dot stow                    # stow home/ into $HOME
+./dot post                    # run post-stow setup
 ```
 
 ## Setup conventions
@@ -26,7 +26,7 @@ Personal dotfiles repo. Keep changes simple, idempotent, and low-risk.
 - Setup scripts must be safe to re-run and avoid destructive changes.
 - Do not run setup scripts unless explicitly asked.
 
-Setup scripts run through `dotfiles-setup` receive:
+Setup scripts run through `dot` receive:
 
 - `DOTFILES_REPO`
 - `DOTFILES_LIB`
