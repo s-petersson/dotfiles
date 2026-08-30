@@ -13,10 +13,10 @@ Personal dotfiles repo. Keep changes simple, idempotent, and low-risk.
 ## Commands
 
 ```sh
-./install.sh                  # pre setup, stow, post setup
-./bin/dotfiles-stow           # stow home/ into $HOME
-./bin/dotfiles-setup pre      # run pre-stow setup
-./bin/dotfiles-setup post     # run post-stow setup
+./bin/dot install             # pre setup, stow, post setup
+./bin/dot pre                 # run pre-stow setup
+./bin/dot stow                # stow home/ into $HOME
+./bin/dot post                # run post-stow setup
 ```
 
 ## Setup conventions
