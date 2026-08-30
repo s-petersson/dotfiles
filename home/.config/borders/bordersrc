@@ -1,16 +1,19 @@
 #!/bin/bash
 
-options=(
-  style=round
-  width=4.0
-  hidpi=on
-  active_color=0xffd79921
-  inactive_color=0xff504945
-)
+active_color=0xffd79921
+inactive_color=0xff504945
 
 theme="$HOME/.local/state/dotfiles/theme/current/borders.conf"
 if [ -r "$theme" ]; then
   source "$theme"
 fi
+
+options=(
+  style=round
+  width=4.0
+  hidpi=on
+  "active_color=$active_color"
+  "inactive_color=$inactive_color"
+)
 
 borders "${options[@]}"
