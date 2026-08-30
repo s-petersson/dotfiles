@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+option() {
+  tmux show-option -gqv "$1"
+}
+
+bg=$(option @theme_bg)
+fg=$(option @theme_fg)
+surface=$(option @theme_surface)
+mantle=$(option @theme_mantle)
+blue=$(option @theme_blue)
+overlay=$(option @theme_overlay_muted)
+pink=$(option @theme_pink)
+green=$(option @theme_green)
+yellow=$(option @theme_yellow)
+
+colors="bg:$bg,fg:$fg,bg+:$surface,fg+:$blue,border:$surface,preview-bg:$mantle,label:$blue,header:$overlay,prompt:$blue,pointer:$pink,marker:$green,hl:$yellow,hl+:$yellow,info:$overlay"
+
+exec fzf-tmux -p 55%,60% \
+  --reverse --ansi \
+  --border=thinblock \
+  --preview-window 'right:55%,border-thinblock' \
+  --color "$colors" \
+  "$@"

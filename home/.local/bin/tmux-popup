@@ -1,12 +1,20 @@
 #!/bin/sh
+set -eu
 
-id=${2:}
-
-width=${3:-80%}
+session=${1:-popup}
+width=${2:-80%}
 height=${3:-80%}
 
-if [ "$(tmux display-message -p -F "#{session_name}")" = "popup" ];then
-    tmux detach-client
+case $session in
+  *[!A-Za-z0-9_.-]*)
+    printf 'Invalid tmux session name: %s\n' "$session" >&2
+    exit 2
+    ;;
+esac
+
+if [ "$(tmux display-message -p '#{session_name}')" = "$session" ]; then
+  tmux detach-client
 else
-    tmux popup -d '#{pane_current_path}-${id}' -xC -yC -w$width -h$height -E "tmux attach -t popup || tmux new -s popup"
+  tmux popup -d '#{pane_current_path}' -x C -y C -w "$width" -h "$height" -E \
+    "tmux attach -t '$session' || tmux new-session -s '$session'"
 fi
