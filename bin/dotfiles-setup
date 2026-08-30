@@ -4,9 +4,9 @@ set -euo pipefail
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 phase="${1:-all}"
 
-source "$repo/lib/dotfiles/work-repo.sh"
-dotfiles_resolve_work_repo "$repo"
-work_repo="$DOTFILES_RESOLVED_WORK_REPO"
+source "$repo/lib/dotfiles/private-repo.sh"
+dotfiles_resolve_private_repo "$repo"
+private_repo="$DOTFILES_RESOLVED_PRIVATE_REPO"
 
 run_phase() {
   local source_repo="$1"
@@ -44,8 +44,8 @@ run_all_repos() {
   local name="$1"
 
   run_phase "$repo" "$name" public
-  if [ -n "$work_repo" ]; then
-    run_phase "$work_repo" "$name" work
+  if [ -n "$private_repo" ]; then
+    run_phase "$private_repo" "$name" private
   fi
 }
 

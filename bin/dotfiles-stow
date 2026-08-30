@@ -8,9 +8,9 @@ if ! command -v stow >/dev/null 2>&1; then
   exit 1
 fi
 
-source "$repo/lib/dotfiles/work-repo.sh"
-dotfiles_resolve_work_repo "$repo"
-work_repo="$DOTFILES_RESOLVED_WORK_REPO"
+source "$repo/lib/dotfiles/private-repo.sh"
+dotfiles_resolve_private_repo "$repo"
+private_repo="$DOTFILES_RESOLVED_PRIVATE_REPO"
 
 stow_home() {
   local source_repo="$1"
@@ -20,28 +20,28 @@ stow_home() {
   stow --no-folding "$@" -d "$source_repo" -t "$HOME" home
 }
 
-# Unstow first so a public link from an earlier run can become a work override.
-if [ -n "$work_repo" ]; then
-  echo "==> Unstowing previous work dotfiles from $work_repo/home"
-  stow_home "$work_repo" -D
+# Unstow first so a public link from an earlier run can become a private override.
+if [ -n "$private_repo" ]; then
+  echo "==> Unstowing previous private dotfiles from $private_repo/home"
+  stow_home "$private_repo" -D
 fi
 
 echo "==> Unstowing previous public dotfiles from $repo/home"
 stow_home "$repo" -D
 
 ignore_args=()
-if [ -n "$work_repo" ] && [ -d "$work_repo/home" ]; then
+if [ -n "$private_repo" ] && [ -d "$private_repo/home" ]; then
   while IFS= read -r -d '' file; do
-    relative="${file#"$work_repo/home/"}"
+    relative="${file#"$private_repo/home/"}"
     escaped="$(printf '%s' "$relative" | sed 's/[][\\.^$*+?(){}|]/\\&/g')"
     ignore_args+=(--ignore="^${escaped}$")
-  done < <(find "$work_repo/home" \( -type f -o -type l \) -print0)
+  done < <(find "$private_repo/home" \( -type f -o -type l \) -print0)
 fi
 
 echo "==> Stowing public home/ into $HOME"
 stow_home "$repo" "${ignore_args[@]}"
 
-if [ -n "$work_repo" ]; then
-  echo "==> Stowing work home/ from $work_repo into $HOME"
-  stow_home "$work_repo"
+if [ -n "$private_repo" ]; then
+  echo "==> Stowing private home/ from $private_repo into $HOME"
+  stow_home "$private_repo"
 fi

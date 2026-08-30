@@ -55,7 +55,7 @@
 	helper =
 	helper = !gh auth git-credential
 
-# A private work dotfiles repository can add conditional includes here, for
-# example based on the directory containing a work checkout.
+# A private dotfiles repository can add conditional includes here, for
+# example based on the directory containing a private checkout.
 [include]
-	path = ~/.config/git/work-overrides.gitconfig
+	path = ~/.config/git/private-overrides.gitconfig

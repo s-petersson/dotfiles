@@ -43,35 +43,35 @@ dot theme choose
 dot help
 ```
 
-## Private work overrides
+## Private overrides
 
-An optional private repository can add work-only files and override public files. By default it is discovered next to this repository with a `-work` suffix:
+An optional private repository can add private files and override public files. By default it is discovered next to this repository with a `-private` suffix:
 
 ```text
 ~/code/dotfiles/       # this public repository
-~/code/dotfiles-work/  # private repository
+~/code/dotfiles-private/  # private repository
 ```
 
 The private repository uses the same `home/`, `setup/pre/`, and `setup/post/` layout. Running `dot install` in the public repository automatically:
 
-1. runs public and then work pre-setup scripts;
-2. stows public files, excluding paths supplied by the work repository;
-3. stows work files; and
-4. runs public and then work post-setup scripts.
+1. runs public and then private pre-setup scripts;
+2. stows public files, excluding paths supplied by the private repository;
+3. stows private files; and
+4. runs public and then private post-setup scripts.
 
 Set an explicit location when the repositories are not siblings:
 
 ```sh
-DOTFILES_WORK_REPO="$HOME/private/work-dotfiles" dot install
+DOTFILES_PRIVATE_REPO="$HOME/private/dotfiles" dot install
 ```
 
-Set `DOTFILES_WORK_REPO` to an empty value to disable automatic discovery:
+Set `DOTFILES_PRIVATE_REPO` to an empty value to disable automatic discovery:
 
 ```sh
-DOTFILES_WORK_REPO= dot install
+DOTFILES_PRIVATE_REPO= dot install
 ```
 
-The work repository's setup scripts receive `DOTFILES_REPO` pointing to the work repository and `DOTFILES_LIB` pointing to the shared helpers in this public repository.
+The private repository's setup scripts receive `DOTFILES_REPO` pointing to the private repository and `DOTFILES_LIB` pointing to the shared helpers in this public repository.
 
 ## Themes
 
