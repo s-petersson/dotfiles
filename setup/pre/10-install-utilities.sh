@@ -3,6 +3,7 @@
 source "${DOTFILES_LIB:?}/packages.sh"
 
 dotfiles_install_packages \
+    curl \
     openssh \
     stow \
     fzf \
