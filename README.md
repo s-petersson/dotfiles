@@ -17,11 +17,10 @@ Personal dotfiles managed with GNU stow plus small idempotent setup scripts.
 ├── lib/
 │   └── dotfiles/
 │       └── platform.sh
-└── setup/
-    ├── pre/
-    │   └── ... scripts run before stow ...
-    └── post/
-        └── ... scripts run after stow ...
+├── pre/
+│   └── ... scripts run before stow ...
+└── post/
+    └── ... scripts run after stow ...
 ```
 
 The `home/` directory mirrors paths relative to `$HOME`.
@@ -52,7 +51,7 @@ An optional private repository can add private files and override public files. 
 ~/code/dotfiles-private/  # private repository
 ```
 
-The private repository uses the same `home/`, `setup/pre/`, and `setup/post/` layout. Running `dot install` in the public repository automatically:
+The private repository uses the same `home/`, `pre/`, and `post/` layout. Running `dot install` in the public repository automatically:
 
 1. runs public and then private pre-setup scripts;
 2. stows public files, excluding paths supplied by the private repository;
@@ -74,15 +73,15 @@ On Omarchy, selections from the native theme switcher use the same rendering flo
 
 ## Setup scripts
 
-Put imperative setup in `setup/pre/` or `setup/post/`. Scripts must be safe to re-run and should avoid destructive changes.
+Put imperative setup in `pre/` or `post/`. Scripts must be safe to re-run and should avoid destructive changes.
 
 Scripts are run in lexical order, so use numeric prefixes:
 
 ```text
-setup/pre/10-packages.sh
-setup/pre/20-omarchy-packages.sh
-setup/post/10-systemd-user.sh
-setup/post/20-omarchy-reload.sh
+pre/10-packages.sh
+pre/20-omarchy-packages.sh
+post/10-systemd-user.sh
+post/20-omarchy-reload.sh
 ```
 
 `pre` and `post` is relative to `stow`. Meaning pre-stow scripts are for preparation before symlinks exist. Post-stow scripts are for activation/reload steps after symlinks exist.

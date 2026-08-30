@@ -32,7 +32,7 @@ Generated files live under `~/.local/state/dotfiles/theme/current/`. Do not stow
 - `home/.local/bin/dotfiles-theme` validates palettes, renders templates, activates a generation, and reloads consumers.
 - `home/.config/omarchy/themes/<slug>` makes a tracked theme available to Omarchy.
 - `home/.config/omarchy/hooks/theme-set.d/dotfiles-theme` synchronizes Omarchy selections.
-- `setup/post/40-apply-theme.sh` reapplies the selected theme after stow. A new macOS installation starts with Gruvbox.
+- `post/40-apply-theme.sh` reapplies the selected theme after stow. A new macOS installation starts with Gruvbox.
 
 The renderer can also use the active Omarchy theme's `colors.toml`. This lets untracked Omarchy themes pass through the same rendering pipeline.
 

@@ -7,8 +7,8 @@ Personal dotfiles repo. Keep changes simple, idempotent, and low-risk.
 - `home/` mirrors `$HOME` and is managed with GNU stow.
 - `bin/` contains helper commands.
 - `lib/dotfiles/` contains reusable shell helpers.
-- `setup/pre/` contains setup scripts that run before stow.
-- `setup/post/` contains setup scripts that run after stow.
+- `pre/` contains setup scripts that run before stow.
+- `post/` contains setup scripts that run after stow.
 
 ## Commands
 

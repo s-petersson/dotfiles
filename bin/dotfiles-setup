@@ -12,10 +12,10 @@ run_phase() {
   local source_repo="$1"
   local name="$2"
   local kind="$3"
-  local dir="$source_repo/setup/$name"
+  local dir="$source_repo/$name"
 
   if [ ! -d "$dir" ]; then
-    echo "==> No $kind setup/$name/ directory found; skipping"
+    echo "==> No $kind $name/ directory found; skipping"
     return 0
   fi
 
@@ -36,7 +36,7 @@ run_phase() {
   done
 
   if [ "$found" -eq 0 ]; then
-    echo "==> No $kind setup/$name scripts found"
+    echo "==> No $kind $name scripts found"
   fi
 }
 

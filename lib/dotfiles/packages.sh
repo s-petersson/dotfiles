@@ -2,7 +2,7 @@
 
 # Package install helpers for setup scripts.
 #
-# Usage from setup/pre/*.sh or setup/post/*.sh:
+# Usage from pre/*.sh or post/*.sh:
 #
 #   source "${DOTFILES_LIB:?}/packages.sh"
 #   dotfiles_install_packages <package_name>...
