@@ -6,4 +6,5 @@ dotfiles_install_packages \
     openssh \
     stow \
     fzf \
-    neovim
+    neovim \
+    starship

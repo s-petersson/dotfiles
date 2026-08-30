@@ -16,6 +16,7 @@ conflicts=(
   ".cache/nvim"
   ".pi/agent/settings.json"
   ".config/hypr"
+  ".config/starship.toml"
 )
 
 for relative in "${conflicts[@]}"; do
