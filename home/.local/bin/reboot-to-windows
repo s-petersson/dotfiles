@@ -1,4 +1,5 @@
 #!/bin/sh
+# Set the one-time UEFI Windows boot entry; run `reboot-to-windows [OPTIONS]`.
 set -eu
 
 usage() {
