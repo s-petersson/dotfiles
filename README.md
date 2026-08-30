@@ -75,14 +75,14 @@ The private repository's setup scripts receive `DOTFILES_REPO` pointing to the p
 
 ## Themes
 
-Shared Ghostty, tmux, Neovim, and Starship colors can be switched on macOS and Omarchy:
+A shared semantic palette can be switched on macOS and Omarchy. Theme-aware configuration is generated from that palette, while settings unrelated to color stay in the regular config files:
 
 ```sh
 dot theme choose
 dot theme set gruvbox
 ```
 
-On Omarchy, selections from the native theme switcher also update the shared tools. See [`docs/theming.md`](docs/theming.md) for the palette format and instructions for adding themes or tools.
+On Omarchy, selections from the native theme switcher use the same rendering flow. See [`docs/theming.md`](docs/theming.md) for the palette format, rendering model, and integration contract.
 
 ## Setup scripts
 

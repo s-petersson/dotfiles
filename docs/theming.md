@@ -1,6 +1,16 @@
 # Theming
 
-`dotfiles-theme` applies one semantic palette to shared tools on macOS and Omarchy. Theme definitions are tracked; rendered files are runtime state.
+The theme system turns one semantic color palette into configuration for anything that needs it. Theme definitions are tracked in the repository. Generated configuration is runtime state and is not committed.
+
+The flow is:
+
+1. Select a theme.
+2. Read and validate its semantic palette.
+3. Render every template with that palette.
+4. Atomically switch `~/.local/state/dotfiles/theme/current/` to the new output.
+5. Notify running programs that need to reload.
+
+A program integrates with the system by consuming a generated file or by inheriting colors from something that already does. This keeps color choices out of static configuration and avoids maintaining separate copies of the same palette.
 
 ## Commands
 
@@ -11,24 +21,24 @@ dotfiles-theme choose
 dotfiles-theme set gruvbox
 ```
 
-On Omarchy, `set` delegates to `omarchy theme set`. Omarchy's `theme-set` hook then renders the shared tool configs, so the Omarchy theme switcher and the dotfiles command follow the same path. On macOS, `set` renders those configs directly.
+On Omarchy, `set` delegates to `omarchy theme set`. Omarchy's `theme-set` hook runs the renderer, so native theme selections and `dotfiles-theme` use the same flow. On macOS, `set` runs the renderer directly.
 
 Generated files live under `~/.local/state/dotfiles/theme/current/`. Do not stow or commit that directory.
 
 ## Sources of truth
 
-- `home/.config/dotfiles/themes/<slug>/colors.toml` defines a complete palette.
-- `home/.config/dotfiles/theme-templates/<output>.tpl` defines generated tool configuration.
-- `home/.local/bin/dotfiles-theme` renders templates and reloads running tools.
-- `home/.config/omarchy/themes/<slug>` exposes a tracked theme to Omarchy.
+- `home/.config/dotfiles/themes/<slug>/colors.toml` defines a complete semantic palette.
+- `home/.config/dotfiles/theme-templates/<output>.tpl` maps that palette to a configuration format.
+- `home/.local/bin/dotfiles-theme` validates palettes, renders templates, activates a generation, and reloads consumers.
+- `home/.config/omarchy/themes/<slug>` makes a tracked theme available to Omarchy.
 - `home/.config/omarchy/hooks/theme-set.d/dotfiles-theme` synchronizes Omarchy selections.
 - `setup/post/40-apply-theme.sh` reapplies the selected theme after stow. A new macOS installation starts with Gruvbox.
 
-The renderer can also consume the active Omarchy theme's `colors.toml`. This keeps shared tools synchronized when the user selects a stock Omarchy theme that is not tracked in this repository.
+The renderer can also use the active Omarchy theme's `colors.toml`. This lets untracked Omarchy themes pass through the same rendering pipeline.
 
 ## Palette contract
 
-Every tracked theme must have `mode`, set to `dark` or `light`, and all of these six-digit hex colors:
+Templates use semantic names instead of theme-specific color values. Every tracked theme must set `mode` to `dark` or `light` and define these six-digit hex colors:
 
 ```text
 accent selection muted
@@ -38,42 +48,34 @@ red yellow orange green cyan blue magenta brown
 bright_red bright_yellow bright_green bright_cyan bright_blue bright_magenta
 ```
 
-This is compatible with Omarchy's semantic `colors.toml` format. Keep tracked themes complete rather than relying on files from `/usr/share/omarchy`.
+The format is compatible with Omarchy's semantic `colors.toml`. Keep tracked themes complete rather than relying on files from `/usr/share/omarchy`.
 
 To add a theme:
 
 1. Add `home/.config/dotfiles/themes/<slug>/colors.toml` with the complete palette.
-2. Add the relative link `home/.config/omarchy/themes/<slug>` pointing to `../../dotfiles/themes/<slug>` if it should appear in Omarchy.
+2. If Omarchy should list it, add a relative link at `home/.config/omarchy/themes/<slug>` pointing to `../../dotfiles/themes/<slug>`.
 3. Run `dotfiles-theme set <slug>` to validate and select it.
-4. On Omarchy, run `omarchy theme set <slug>` and confirm the graphical switcher lists it.
+4. On Omarchy, run `omarchy theme set <slug>` and confirm the native switcher lists it.
 
-Backgrounds may live in the tracked theme's `backgrounds/` directory. Omarchy consumes them; the portable renderer ignores them.
+A tracked theme may also contain a `backgrounds/` directory for platform-specific consumers. The portable renderer only reads `colors.toml`.
 
-## Adding support for a tool
+## Adding an integration
 
-First decide who owns the tool. Omarchy owns its shell, Hyprland, Linux desktop appearance, wallpaper transitions, and built-in platform integrations. The dotfiles renderer owns cross-platform tools and custom configuration.
+First decide which system owns the colors. Do not generate configuration when the program can inherit the palette from an existing themed parent, such as a terminal. If another theme manager owns the program, integrate with that manager rather than overriding its output.
 
-For a renderer-owned tool:
+When generated configuration is needed:
 
-1. Add `home/.config/dotfiles/theme-templates/<output>.tpl`. Use tokens such as `{{ background }}` from the palette contract.
-2. Make the tool's static config optionally include `~/.local/state/dotfiles/theme/current/<output>`. Keep non-color settings in the static config.
-3. Add the smallest safe live-reload command to `reload_apps` in `home/.local/bin/dotfiles-theme`. If the tool watches included files, no command is needed.
-4. Apply both tracked themes and inspect the generated output for unresolved `{{ ... }}` tokens.
-5. Test a running instance and a newly launched instance on each platform the tool supports.
+1. Add `home/.config/dotfiles/theme-templates/<output>.tpl`. Use palette tokens such as `{{ background }}`.
+2. Make the program's static configuration load `~/.local/state/dotfiles/theme/current/<output>`. Keep settings unrelated to color in the static configuration.
+3. If the program does not watch that file, add the smallest safe reload action to `reload_apps` in `home/.local/bin/dotfiles-theme`.
+4. Apply every tracked theme and check each generated file for unresolved `{{ ... }}` tokens.
+5. Test an existing process and a newly started process on every supported platform.
 
-Prefer ANSI color names for terminal children when they provide enough control. They inherit Ghostty's palette and need no generated file. Starship and the tmux window picker use this approach.
-
-## Current integrations
-
-- Ghostty optionally includes the generated `ghostty.conf`. Omarchy's generated Ghostty file loads first, and the shared palette loads last. The renderer sends `SIGUSR2` after replacing the shared file so running Ghostty instances reload it.
-- tmux sources generated color options and reloads active sessions after a change. Run `dotfiles-theme set <theme>` before starting tmux.
-- Neovim maps the semantic palette into the existing Catppuccin-based highlights. `dotfiles-theme` sends `SIGUSR1` to running Neovim processes. `:DotfilesThemeReload` is the manual fallback.
-- Pi loads the generated `pi.json` as its `dotfiles` theme. A global extension watches theme selections and runs pi's reload flow so existing transcript components are rendered again with the new colors.
-- Starship uses ANSI names and follows the terminal palette without rendering.
+This is the whole integration contract: a semantic palette, a small format adapter, a stable runtime path, and an optional reload action.
 
 ## Verification
 
-Use a temporary home when testing renderer changes so tracked or live configuration is not replaced:
+Use a temporary home when testing renderer changes so live configuration is not replaced:
 
 ```sh
 tmp=$(mktemp -d)
@@ -85,7 +87,8 @@ DOTFILES_THEME_NO_RELOAD=1 \
   ./home/.local/bin/dotfiles-theme set gruvbox
 
 ls -1 "$tmp/state/dotfiles/theme/current"
+! grep -R '{{.*}}' "$tmp/state/dotfiles/theme/current"
 rm -rf "$tmp"
 ```
 
-Also run `sh -n home/.local/bin/dotfiles-theme` and start Neovim headlessly after changes to its integration.
+Also run `sh -n home/.local/bin/dotfiles-theme`. Test any reload action on a running process as well as a newly started one.
