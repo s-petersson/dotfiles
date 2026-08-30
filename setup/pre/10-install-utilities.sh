@@ -9,4 +9,5 @@ dotfiles_install_packages \
     neovim \
     starship \
     fnm \
-    uv
+    uv \
+    eza
