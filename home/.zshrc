@@ -8,7 +8,7 @@ export GIT_EDITOR="nvim"
 bindkey -e
 
 # Load Secrets
-source $XDG_CONFIG_HOME/.env.secret
+[[ -f "$XDG_CONFIG_HOME/.env.secret" ]] && source "$XDG_CONFIG_HOME/.env.secret"
 
 # User installed tools
 export PATH="$HOME/.local/bin:$PATH"
@@ -20,12 +20,18 @@ autoload bashcompinit && bashcompinit
 autoload -Uz compinit
 compinit
 
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+if [[ "$OSTYPE" == darwin* ]]; then
+  source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+else
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
 
 eval "$(starship init zsh)"
 eval "$(fnm env)"
 eval "$(zoxide init zsh)"
+export FZF_CTRL_R_OPTS="--reverse"
 source <(fzf --zsh)
 
 alias pi="PI_HARDWARE_CURSOR=1 pi"
@@ -33,6 +39,7 @@ alias vim=nvim
 
 # aliases; commands
 alias cat=bat
+alias ls="eza -lah"
 alias l="eza -lah"
 
 # aliases; git
