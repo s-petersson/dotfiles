@@ -16,6 +16,7 @@ dotfiles_install_packages \
     uv \
     eza \
     bat \
+    tuicr \
     --macos FelixKratz/formulae/borders \
     --arch ghostty \
     obsidian

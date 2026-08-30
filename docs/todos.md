@@ -1,12 +1,8 @@
 # TODOs
 
-These are applications & utilities that I use but have yet to configure in this repository. When items on this list are added to the repo and configured, they should be removed from this list.
-
-## MacOS 
+Applications and utilities that still need installation or configuration in this repository.
 
 ## Linux
+
 - CoolerControl (AUR)
 - nct6687d kernel driver (manual build and install) (https://github.com/Fred78290/nct6687d)
-
-## Shared
-- tuicr

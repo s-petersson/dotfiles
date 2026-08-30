@@ -1,0 +1,5 @@
+appearance = "system"
+diff_view = "side-by-side"
+comment_vim = true
+relative_line_numbers = true
+scroll_offset = 5
