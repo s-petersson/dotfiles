@@ -18,4 +18,6 @@ dotfiles_install_packages \
     bat \
     --arch ghostty
 
-dotfiles_install_homebrew_casks ghostty
+dotfiles_install_homebrew_casks \
+    ghostty \
+    nikitabobko/tap/aerospace
