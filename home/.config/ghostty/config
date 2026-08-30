@@ -10,6 +10,7 @@ font-size = 9
 adjust-cell-height = 20%
 
 window-decoration = none
+confirm-close-surface = false
 window-padding-x = 0
 window-padding-y = 0
 window-padding-balance = true
