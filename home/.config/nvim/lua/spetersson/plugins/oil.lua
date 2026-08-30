@@ -2,7 +2,7 @@ local CHARS = require('spetersson.utils.chars')
 require('oil').setup({
     float = {
         max_width = 0.65,
-        max_height = 0.65,
+        max_height = 0.4,
         border = CHARS.border_chars_outer_thin,
     },
     keymaps = {
