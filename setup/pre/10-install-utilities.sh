@@ -5,4 +5,5 @@ source "${DOTFILES_LIB:?}/packages.sh"
 dotfiles_install_packages \
     openssh \
     stow \
-    fzf
+    fzf \
+    neovim
