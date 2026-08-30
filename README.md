@@ -45,7 +45,7 @@ dot help
 
 ## Private overrides
 
-An optional private repository can add private files and override public files. By default it is discovered next to this repository with a `-private` suffix:
+An optional private repository can add private files and override public files. It is discovered next to this repository with a `-private` suffix:
 
 ```text
 ~/code/dotfiles/       # this public repository
@@ -58,18 +58,6 @@ The private repository uses the same `home/`, `setup/pre/`, and `setup/post/` la
 2. stows public files, excluding paths supplied by the private repository;
 3. stows private files; and
 4. runs public and then private post-setup scripts.
-
-Set an explicit location when the repositories are not siblings:
-
-```sh
-DOTFILES_PRIVATE_REPO="$HOME/private/dotfiles" dot install
-```
-
-Set `DOTFILES_PRIVATE_REPO` to an empty value to disable automatic discovery:
-
-```sh
-DOTFILES_PRIVATE_REPO= dot install
-```
 
 The private repository's setup scripts receive `DOTFILES_REPO` pointing to the private repository and `DOTFILES_LIB` pointing to the shared helpers in this public repository.
 
