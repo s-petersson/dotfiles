@@ -1,0 +1,62 @@
+#!/bin/sh
+# List or apply pane layouts for the tmux session and template picker scripts.
+set -eu
+
+template=${1:-}
+session=${2:-}
+directory=${3:-}
+
+list_templates() {
+  printf '%s\n' blank workspace v-split h-split grid
+}
+
+create_window() {
+  tmux new-window -d -P -F '#{window_id} #{pane_id}' \
+    -t "$session:" -n "$template" -c "$directory"
+}
+
+apply_template() {
+  targets=$(create_window)
+  window=${targets%% *}
+  pane=${targets#* }
+
+  case $template in
+    blank)
+      ;;
+    workspace)
+      tmux split-window -d -h -p 80 -t "$pane" -c "$directory"
+      tmux split-window -d -v -p 20 -t "$pane" -c "$directory"
+      ;;
+    v-split)
+      tmux split-window -d -h -p 50 -t "$pane" -c "$directory"
+      ;;
+    h-split)
+      tmux split-window -d -v -p 50 -t "$pane" -c "$directory"
+      ;;
+    grid)
+      right=$(tmux split-window -d -h -p 50 -P -F '#{pane_id}' -t "$pane" -c "$directory")
+      tmux split-window -d -v -p 50 -t "$pane" -c "$directory"
+      tmux split-window -d -v -p 50 -t "$right" -c "$directory"
+      tmux select-layout -t "$window" tiled >/dev/null
+      ;;
+    *)
+      tmux kill-window -t "$window"
+      printf 'Unknown tmux template: %s\n' "$template" >&2
+      exit 2
+      ;;
+  esac
+
+  tmux select-window -t "$window"
+}
+
+if [ "$template" = list ]; then
+  list_templates
+  exit 0
+fi
+
+if [ -z "$template" ] || [ -z "$session" ] || [ -z "$directory" ]; then
+  printf 'Usage: tmux-template TEMPLATE SESSION DIRECTORY\n' >&2
+  exit 2
+fi
+
+apply_template

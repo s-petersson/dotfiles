@@ -1,19 +1,18 @@
 #!/bin/sh
+# Choose or kill a tmux session with fzf; tmux binds this to prefix+w.
 set -eu
 
 selection=$(
-  sesh list --icons | tmux-fzf-popup \
+  tmux-session-list | tmux-fzf-popup \
     --no-sort \
-    --border-label ' sesh ' \
+    --delimiter '\t' \
+    --with-nth 2 \
+    --border-label ' sessions ' \
     --prompt '>  ' \
-    --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find' \
-    --preview 'sesh preview {}' \
-    --bind 'ctrl-a:reload(sesh list --icons)' \
-    --bind 'ctrl-t:reload(sesh list -t --icons)' \
-    --bind 'ctrl-g:reload(sesh list -c --icons)' \
-    --bind 'ctrl-x:reload(sesh list -z --icons)' \
-    --bind 'ctrl-f:reload(fd -H -d 2 -t d -E .Trash . ~)' \
-    --bind 'ctrl-d:execute(tmux kill-session -t {2..})+change-prompt(⚡  )+reload(sesh list --icons)'
+    --header '  ^d kill session' \
+    --preview 'tmux capture-pane -ep -t {1}' \
+    --bind 'ctrl-d:execute(tmux kill-session -t {1})+reload(tmux-session-list)'
 ) || exit 0
 
-[ -n "$selection" ] && sesh connect "$selection"
+target=$(printf '%s\n' "$selection" | cut -f1)
+[ -n "$target" ] && tmux switch-client -t "=$target"

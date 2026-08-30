@@ -17,7 +17,6 @@ conflicts=(
   ".pi/agent/settings.json"
   ".config/hypr"
   ".config/starship.toml"
-  ".config/herdr/config.toml"
 )
 
 for relative in "${conflicts[@]}"; do

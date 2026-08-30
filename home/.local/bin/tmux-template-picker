@@ -1,0 +1,15 @@
+#!/bin/sh
+# Pick and apply a pane layout with fzf; tmux binds this to prefix+A.
+set -eu
+
+session=$(tmux display-message -p '#{session_name}')
+directory=$(tmux display-message -p '#{pane_current_path}')
+
+template=$(
+  tmux-template list | tmux-fzf-popup \
+    --no-preview \
+    --border-label ' templates ' \
+    --prompt '>  '
+) || exit 0
+
+[ -n "$template" ] && tmux-template "$template" "$session" "$directory"

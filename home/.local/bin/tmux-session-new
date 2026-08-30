@@ -1,0 +1,49 @@
+#!/bin/sh
+# Prompt for a templated tmux session; tmux binds this to prefix+C.
+set -eu
+
+directory=$PWD
+
+ansi_rgb() {
+  hex=${1#\#}
+  red=${hex%????}
+  rest=${hex#??}
+  green=${rest%??}
+  blue=${hex#????}
+  printf '%d;%d;%d' "$((0x$red))" "$((0x$green))" "$((0x$blue))"
+}
+
+background=$(ansi_rgb "$(tmux show-option -gqv @theme_mantle)")
+foreground=$(ansi_rgb "$(tmux show-option -gqv @theme_fg)")
+printf '\033[48;2;%sm\033[38;2;%sm\033[2J\033[H\n  Session name: ' "$background" "$foreground"
+IFS= read -r session || exit 0
+
+case $session in
+  ''|*[!A-Za-z0-9_.-]*)
+    tmux display-message "Invalid session name: $session"
+    exit 2
+    ;;
+esac
+
+if tmux has-session -t "=$session" 2>/dev/null; then
+  tmux display-message "Session already exists: $session"
+  exit 2
+fi
+
+template=$(
+  tmux-template list | TMUX_FZF_INLINE=1 tmux-fzf-popup \
+    --no-preview \
+    --border-label ' template ' \
+    --prompt '>  '
+) || exit 0
+
+[ -n "$template" ] || exit 0
+
+bootstrap=$(tmux new-session -d -P -F '#{window_id}' -s "$session" -n bootstrap -c "$directory")
+if tmux-template "$template" "$session" "$directory"; then
+  tmux kill-window -t "$bootstrap"
+  tmux switch-client -t "=$session"
+else
+  tmux kill-session -t "=$session"
+  exit 1
+fi

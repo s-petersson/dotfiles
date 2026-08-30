@@ -1,15 +1,12 @@
 #!/bin/sh
-# List all tmux windows across sessions, one per line, tab-separated as:
-#   <target>\t<colored display>
-# where <target> is "session:index" (used for preview/switching) and the
-# display is an aligned, ANSI-colored "session  window" string for fzf.
+# Format all tmux windows for `tmux-window-picker`; not intended for direct use.
 
 tmux list-windows -a -F '#{session_name}:#{window_index}	#{session_name}	#{window_name}	#{window_active}' | awk -F'\t' '
 { t[NR]=$1; s[NR]=$2; win[NR]=$3; active[NR]=$4; if (length($2) > w) w = length($2) }
 END {
   for (i = 1; i <= NR; i++) {
-    if (active[i] == "1") { dot = "\033[38;2;169;182;101m●\033[0m"; wc = "\033[38;2;169;182;101m" }
-    else                  { dot = "\033[38;2;89;89;89m·\033[0m";    wc = "\033[38;2;235;219;178m" }
-    printf "%s\t%s \033[38;2;125;174;163m%-*s\033[0m  %s%s\033[0m\n", t[i], dot, w, s[i], wc, win[i]
+    if (active[i] == "1") { dot = "\033[32m●\033[0m"; wc = "\033[32m" }
+    else                  { dot = "\033[90m·\033[0m"; wc = "\033[37m" }
+    printf "%s\t%s \033[34m%-*s\033[0m  %s%s\033[0m\n", t[i], dot, w, s[i], wc, win[i]
   }
 }'

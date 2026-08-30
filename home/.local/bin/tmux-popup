@@ -1,9 +1,13 @@
 #!/bin/sh
+# Toggle a persistent tmux popup session; tmux binds this to prefix+c.
 set -eu
 
 session=${1:-popup}
-width=${2:-80%}
-height=${3:-80%}
+width=${2:-65%}
+height=${3:-65%}
+background=$(tmux show-option -gqv @theme_mantle)
+foreground=$(tmux show-option -gqv @theme_fg)
+border=$(tmux show-option -gqv @theme_surface)
 
 case $session in
   *[!A-Za-z0-9_.-]*)
@@ -15,6 +19,7 @@ esac
 if [ "$(tmux display-message -p '#{session_name}')" = "$session" ]; then
   tmux detach-client
 else
-  tmux popup -d '#{pane_current_path}' -x C -y C -w "$width" -h "$height" -E \
+  tmux popup -d '#{pane_current_path}' -x C -y C -w "$width" -h "$height" \
+    -s "bg=$background,fg=$foreground" -S "fg=$border" -E \
     "tmux attach -t '$session' || tmux new-session -s '$session'"
 fi

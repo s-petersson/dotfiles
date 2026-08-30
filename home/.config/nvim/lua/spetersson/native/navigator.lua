@@ -1,9 +1,7 @@
-local is_herdr = vim.env.HERDR_ENV == '1'
-local is_kitty = not is_herdr and (vim.env.TERM == 'xterm-kitty' or vim.env.KITTY_LISTEN_ON ~= nil)
+local is_kitty = vim.env.TERM == 'xterm-kitty' or vim.env.KITTY_LISTEN_ON ~= nil
 local is_tmux = vim.env.TMUX ~= nil and vim.env.TMUX ~= ''
 
 local direction_map = { h = 'left', j = 'bottom', k = 'top', l = 'right' }
-local herdr_direction = { h = 'left', j = 'down', k = 'up', l = 'right' }
 local tmux_flag = { h = 'L', j = 'D', k = 'U', l = 'R' }
 
 local function navigate(direction)
@@ -12,9 +10,7 @@ local function navigate(direction)
 
     if vim.api.nvim_get_current_win() ~= cur_win then return end
 
-    if is_herdr then
-        vim.system({ vim.env.HERDR_BIN_PATH or 'herdr', 'pane', 'focus', '--current', '--direction', herdr_direction[direction] })
-    elseif is_tmux then
+    if is_tmux then
         vim.fn.system(
             'tmux -S ' .. vim.split(vim.env.TMUX, ',')[1] .. ' select-pane -t ' .. vim.fn.shellescape(vim.env.TMUX_PANE) .. ' -' .. tmux_flag[direction]
         )

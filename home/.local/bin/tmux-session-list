@@ -1,0 +1,9 @@
+#!/bin/sh
+# Format tmux sessions for `tmux-session-picker`; not intended for direct use.
+
+tmux list-sessions -F '#{session_name}	#{session_windows}	#{session_attached}' | awk -F '\t' '
+{
+  attached = $3 > 0 ? "\033[32m●\033[0m" : "\033[90m·\033[0m"
+  windows = $2 == 1 ? "window" : "windows"
+  printf "%s\t%s \033[34m%s\033[0m  \033[37m%s %s\033[0m\n", $1, attached, $1, $2, windows
+}'

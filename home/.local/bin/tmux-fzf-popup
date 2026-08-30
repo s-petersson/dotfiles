@@ -1,4 +1,5 @@
 #!/bin/sh
+# Run the themed fzf UI used by the tmux picker scripts, in a popup by default.
 set -eu
 
 option() {
@@ -16,6 +17,15 @@ green=$(option @theme_green)
 yellow=$(option @theme_yellow)
 
 colors="bg:$bg,fg:$fg,bg+:$surface,fg+:$blue,border:$surface,preview-bg:$mantle,label:$blue,header:$overlay,prompt:$blue,pointer:$pink,marker:$green,hl:$yellow,hl+:$yellow,info:$overlay"
+
+if [ "${TMUX_FZF_INLINE:-0}" = 1 ]; then
+  exec fzf \
+    --reverse --ansi \
+    --border=thinblock \
+    --preview-window 'right:55%,border-thinblock' \
+    --color "$colors" \
+    "$@"
+fi
 
 exec fzf-tmux -p 55%,60% \
   --reverse --ansi \

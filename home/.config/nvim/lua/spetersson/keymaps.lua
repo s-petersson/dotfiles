@@ -70,7 +70,7 @@ map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]ui
 -- is not what someone will guess without a bit more experience.
 map('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- Resize splits with the same directional keys used by Herdr.
+-- Resize splits with directional keys shared with tmux.
 map('n', '<C-S-h>', '<cmd>vertical resize -2<CR>', { desc = 'Shrink split width' })
 map('n', '<C-S-j>', '<cmd>resize +2<CR>', { desc = 'Grow split height' })
 map('n', '<C-S-k>', '<cmd>resize -2<CR>', { desc = 'Shrink split height' })
