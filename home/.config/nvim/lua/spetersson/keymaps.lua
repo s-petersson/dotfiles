@@ -70,16 +70,20 @@ map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]ui
 -- is not what someone will guess without a bit more experience.
 map('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- Resize splits (Ctrl + punctuation: , . - =)
-map('n', '<C-,>', '<cmd>vertical resize +2<CR>', { desc = 'Narrow split' })
-map('n', '<C-.>', '<cmd>vertical resize -2<CR>', { desc = 'Widen split' })
-map('n', '<C-->', '<cmd>resize -2<CR>', { desc = 'Shorten split' })
-map('n', '<C-=>', '<cmd>resize +2<CR>', { desc = 'Taller split' })
+-- Resize splits with the same directional keys used by Herdr.
+map('n', '<C-S-h>', '<cmd>vertical resize -2<CR>', { desc = 'Shrink split width' })
+map('n', '<C-S-j>', '<cmd>resize +2<CR>', { desc = 'Grow split height' })
+map('n', '<C-S-k>', '<cmd>resize -2<CR>', { desc = 'Shrink split height' })
+map('n', '<C-S-l>', '<cmd>vertical resize +2<CR>', { desc = 'Grow split width' })
 
 -- Window management
-map('n', '<leader>wq', '<C-w>q', { desc = 'Close window' })
-map('n', '<leader>wv', '<C-w>v', { desc = 'Split window vertically' })
-map('n', '<leader>ws', '<C-w>s', { desc = 'Split window horizontally' })
+-- map('n', '<leader>wq', '<C-w>q', { desc = 'Close window' })
+-- map('n', '<leader>wv', '<C-w>v', { desc = 'Split window vertically' })
+-- map('n', '<leader>wh', '<C-w>s', { desc = 'Split window horizontally' })
+-- map('n', '<leader>wH', '<C-w>H', { desc = 'Swap window left' })
+-- map('n', '<leader>wL', '<C-w>L', { desc = 'Swap window right' })
+-- map('n', '<leader>wJ', '<C-w>J', { desc = 'Swap window down' })
+-- map('n', '<leader>wK', '<C-w>K', { desc = 'Swap window up' })
 
 -- Tab navigation
 map('n', '[t', '<cmd>tabprevious<CR>', { desc = 'Previous tab' })

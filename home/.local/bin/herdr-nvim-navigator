@@ -1,0 +1,38 @@
+#!/bin/sh
+set -u
+
+action=focus
+direction=${1:-}
+if [ "$direction" = resize ]; then
+    action=resize
+    direction=${2:-}
+fi
+
+case "$action:$direction" in
+    focus:left) key=ctrl+h ;;
+    focus:down) key=ctrl+j ;;
+    focus:up) key=ctrl+k ;;
+    focus:right) key=ctrl+l ;;
+    resize:left) key=ctrl+shift+h ;;
+    resize:down) key=ctrl+shift+j ;;
+    resize:up) key=ctrl+shift+k ;;
+    resize:right) key=ctrl+shift+l ;;
+    *) exit 2 ;;
+esac
+
+herdr_bin=${HERDR_BIN_PATH:-herdr}
+pane_id=${HERDR_ACTIVE_PANE_ID:-}
+[ -n "$pane_id" ] || exit 1
+
+vim_pattern='([^"[:space:]]+/)?g?\.?(view|l?n?vim?x?|fzf)(diff)?(-wrapped)?'
+process_info=$("$herdr_bin" pane process-info --pane "$pane_id" 2>/dev/null || true)
+
+if printf '%s\n' "$process_info" | grep -Eiq -- '"name"[[:space:]]*:[[:space:]]*"'"$vim_pattern"'"'; then
+    exec "$herdr_bin" pane send-keys "$pane_id" "$key"
+fi
+
+if [ "$action" = resize ]; then
+    exec "$herdr_bin" pane resize --pane "$pane_id" --direction "$direction"
+fi
+
+exec "$herdr_bin" pane focus --pane "$pane_id" --direction "$direction"
