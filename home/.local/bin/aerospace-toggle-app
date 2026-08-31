@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Toggle a macOS app by bundle id:
+#   focused -> hide it (macOS returns focus to the previous window)
+#   else    -> launch or focus it
+set -euo pipefail
+
+bundle_id="${1:?usage: aerospace-toggle-app <bundle-id>}"
+
+if [[ "$(aerospace list-windows --focused --format '%{app-bundle-id}')" == "$bundle_id" ]]; then
+  osascript -e "tell application \"System Events\" to set visible of (first process whose bundle identifier is \"$bundle_id\") to false"
+else
+  open -b "$bundle_id"
+fi

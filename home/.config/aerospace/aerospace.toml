@@ -7,53 +7,90 @@ accordion-padding = 24
 default-root-container-layout = "tiles"
 default-root-container-orientation = "auto"
 on-focused-monitor-changed = ["move-mouse monitor-lazy-center"]
-automatically-unhide-macos-hidden-apps = true
+# automatically-unhide-macos-hidden-apps = true
+# enable-normalization-opposite-orientation-for-nested-containers = false
 
 gaps.inner.horizontal = 8
 gaps.inner.vertical = 8
 gaps.outer.left = 8
 gaps.outer.bottom = 8
-gaps.outer.top = 8
+gaps.outer.top = 6
 gaps.outer.right = 8
 
+# Named workspaces (see keybindings below):
+#   code
+#   browser
+#   chat
+#   docs
+#   design
+
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = 'move-node-to-workspace code'
+
+[[on-window-detected]]
+if.app-id = 'com.brave.Browser'
+run = 'move-node-to-workspace browser'
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = 'move-node-to-workspace browser'
+
+[[on-window-detected]]
+if.app-id = 'md.obsidian'
+run = 'move-node-to-workspace docs'
+
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'layout floating'
+
+[workspace-to-monitor-force-assignment]
+chat = ['secondary', '^DELL U2722D \(1\)$']
+
 [mode.main.binding]
-alt-enter = "exec-and-forget open -na Ghostty"
 
 alt-h = "focus left"
 alt-j = "focus down"
 alt-k = "focus up"
 alt-l = "focus right"
 
-alt-shift-h = "move left"
-alt-shift-j = "move down"
-alt-shift-k = "move up"
-alt-shift-l = "move right"
+alt-shift-h = "move --boundaries-action stop left"
+alt-shift-j = "move --boundaries-action stop down"
+alt-shift-k = "move --boundaries-action stop up"
+alt-shift-l = "move --boundaries-action stop right"
 
-alt-ctrl-shift-l = "layout tiles horizontal vertical"
-alt-ctrl-shift-t = "layout floating tiling"
-alt-ctrl-r = "layout tiles accordion"
+alt-ctrl-shift-f = "layout floating tiling"
+alt-ctrl-shift-r = "layout horizontal vertical"
+alt-ctrl-shift-s = "layout accordion tiles"
 
+alt-ctrl-shift-h = 'join-with left'
+alt-ctrl-shift-j = 'join-with down'
+alt-ctrl-shift-k = 'join-with up'
+alt-ctrl-shift-l = 'join-with right'
+
+alt-ctrl-b = "balance-sizes"
 alt-ctrl-h = "resize width -50"
 alt-ctrl-j = "resize height +50"
 alt-ctrl-k = "resize height -50"
 alt-ctrl-l = "resize width +50"
 
-alt-1 = "workspace 1"
-alt-2 = "workspace 2"
-alt-3 = "workspace 3"
-alt-4 = "workspace 4"
-alt-5 = "workspace 5"
-alt-6 = "workspace 6"
-alt-7 = "workspace 7"
-alt-8 = "workspace 8"
-alt-9 = "workspace 9"
+alt-c = "workspace code"
+alt-b = "workspace browser"
+alt-s = "workspace chat"
+alt-d = "workspace docs"
+alt-f = "workspace design"
+alt-tab = "workspace-back-and-forth"
+alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
-alt-shift-1 = "move-node-to-workspace 1"
-alt-shift-2 = "move-node-to-workspace 2"
-alt-shift-3 = "move-node-to-workspace 3"
-alt-shift-4 = "move-node-to-workspace 4"
-alt-shift-5 = "move-node-to-workspace 5"
-alt-shift-6 = "move-node-to-workspace 6"
-alt-shift-7 = "move-node-to-workspace 7"
-alt-shift-8 = "move-node-to-workspace 8"
-alt-shift-9 = "move-node-to-workspace 9"
+alt-shift-c = "move-node-to-workspace code"
+alt-shift-b = "move-node-to-workspace browser"
+alt-shift-s = "move-node-to-workspace chat"
+alt-shift-d = "move-node-to-workspace docs"
+alt-shift-f = "move-node-to-workspace design"
+
+alt-m = 'exec-and-forget $HOME/.local/bin/aerospace-toggle-app com.spotify.client'
+alt-i = 'exec-and-forget $HOME/.local/bin/aerospace-toggle-app com.apple.finder'
