@@ -24,8 +24,8 @@ apply_template() {
     blank)
       ;;
     workspace)
-      tmux split-window -d -h -p 80 -t "$pane" -c "$directory"
-      tmux split-window -d -v -p 20 -t "$pane" -c "$directory"
+      tmux split-window -d -h -p 60 -t "$pane" -c "$directory"
+      tmux split-window -d -v -p 60 -t "$pane" -c "$directory"
       ;;
     v-split)
       tmux split-window -d -h -p 50 -t "$pane" -c "$directory"
