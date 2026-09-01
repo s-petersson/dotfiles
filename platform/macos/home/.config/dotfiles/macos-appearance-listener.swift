@@ -21,24 +21,15 @@ func syncTheme() {
     }
 }
 
-let center = DistributedNotificationCenter.default()
-let observer = center.addObserver(
-    forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
-    object: nil,
-    queue: .main
-) { _ in
-    syncTheme()
-}
-
 syncTheme()
 
-let timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
+let timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
     let mode = currentMode()
     if mode != lastMode {
         syncTheme()
     }
 }
 
-withExtendedLifetime((observer, timer)) {
+withExtendedLifetime(timer) {
     RunLoop.main.run()
 }
