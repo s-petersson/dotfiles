@@ -7,6 +7,10 @@ config-file = ?"platform.conf"
 # Attach to the most recently used tmux session, or create one
 command = zsh -lc 'tmux attach-session || tmux new-session; exec "$SHELL" -l'
 
+window-decoration = none
+window-padding-x = 0
+window-padding-y = 0
+
 font-size = 12
 adjust-cell-height = 20%
 
