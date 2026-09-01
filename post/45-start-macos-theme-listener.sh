@@ -14,4 +14,13 @@ plist="$HOME/Library/LaunchAgents/$label.plist"
 if launchctl print "$service" >/dev/null 2>&1; then
   launchctl bootout "$service"
 fi
-launchctl bootstrap "gui/$(id -u)" "$plist"
+
+for _ in {1..50}; do
+  if bootstrap_error=$(launchctl bootstrap "gui/$(id -u)" "$plist" 2>&1); then
+    exit 0
+  fi
+  sleep 0.1
+done
+
+printf '%s\n' "$bootstrap_error" >&2
+exit 1
