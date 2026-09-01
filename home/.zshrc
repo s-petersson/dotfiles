@@ -7,7 +7,8 @@ export EDITOR="nvim"
 export GIT_EDITOR="nvim"
 bindkey -e
 
-# Load Secrets
+# Load Environment Variables
+[[ -f "$XDG_CONFIG_HOME/.env" ]] && source "$XDG_CONFIG_HOME/.env"
 [[ -f "$XDG_CONFIG_HOME/.env.secret" ]] && source "$XDG_CONFIG_HOME/.env.secret"
 
 # User installed tools
@@ -61,3 +62,6 @@ bindkey '\e[6~' down-line-or-history # PageDown
 bindkey '\e[1;5D' backward-word # Ctrl+Left
 bindkey '\e[1;5C' forward-word # Ctrl+Right
 bindkey '\e[Z' reverse-menu-complete # Shift+Tab
+
+export PLANNOTATOR_AI=disabled
+export PLANNOTATOR_SHARE=disabled

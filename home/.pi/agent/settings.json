@@ -1,9 +1,14 @@
 {
   "tuiMode": "fullscreen",
   "theme": "dotfiles",
-  "themes": ["~/.local/state/dotfiles/theme/current/pi.json"],
-  "defaultModel": "gpt-5.6-sol",
+  "themes": [
+    "~/.local/state/dotfiles/theme/current/pi.json"
+  ],
+  "defaultModel": "claude-opus-5",
   "defaultThinkingLevel": "medium",
-  "defaultProvider": "openai-codex",
-  "lastChangelogVersion": "0.84.4"
+  "defaultProvider": "anthropic",
+  "lastChangelogVersion": "0.84.4",
+  "packages": [
+    "npm:@plannotator/pi-extension"
+  ]
 }
