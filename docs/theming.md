@@ -21,7 +21,7 @@ dotfiles-theme choose
 dotfiles-theme set gruvbox
 ```
 
-On Omarchy, `set` delegates to `omarchy theme set`. Omarchy's `theme-set` hook runs the renderer, so native theme selections and `dotfiles-theme` use the same flow. On macOS, `set` runs the renderer directly.
+On Omarchy, `set` delegates to `omarchy theme set`. Omarchy's `theme-set` hook runs the renderer, so native theme selections and `dotfiles-theme` use the same flow. On macOS, `set` runs the renderer and changes the system appearance to match the palette's `mode`.
 
 Generated files live under `~/.local/state/dotfiles/theme/current/`. Do not stow or commit that directory.
 
@@ -32,7 +32,9 @@ Generated files live under `~/.local/state/dotfiles/theme/current/`. Do not stow
 - `home/.local/bin/dotfiles-theme` validates palettes, renders templates, activates a generation, and reloads consumers.
 - `home/.config/omarchy/themes/<slug>` makes a tracked theme available to Omarchy.
 - `home/.config/omarchy/hooks/theme-set.d/dotfiles-theme` synchronizes Omarchy selections.
-- `post/40-apply-theme.sh` reapplies the selected theme after stow. A new macOS installation starts with Gruvbox.
+- `platform/macos/home/.local/bin/dotfiles-macos-appearance` synchronizes themes with the macOS appearance.
+- `platform/macos/home/.config/dotfiles/macos-appearance.conf` sets the initial theme for each macOS appearance.
+- `post/40-apply-theme.sh` reapplies the selected theme after stow. A new macOS installation uses the configured theme matching its current appearance.
 
 The renderer can also use the active Omarchy theme's `colors.toml`. This lets untracked Omarchy themes pass through the same rendering pipeline.
 
@@ -59,6 +61,21 @@ To add a theme:
 
 A tracked theme may also contain a `backgrounds/` directory for platform-specific consumers. The portable renderer only reads `colors.toml`.
 
+## macOS appearance
+
+The macOS integration works in both directions. Selecting a theme changes the system appearance according to the palette's `mode`. Changing the appearance in System Settings, including with the automatic schedule, selects the last theme used for that mode.
+
+The initial choices live in `~/.config/dotfiles/macos-appearance.conf`:
+
+```sh
+dark_theme=gruvbox
+light_theme=gruvbox-light
+```
+
+Manual theme selections replace the remembered choice for their mode in runtime state. The tracked configuration remains the fallback for a new installation.
+
+A LaunchAgent runs a small Swift notification listener from source. It listens for `AppleInterfaceThemeChangedNotification` and calls `dotfiles-macos-appearance sync`. It does not require a repository build step. `post/45-start-macos-theme-listener.sh` loads the agent after stow.
+
 ## Adding an integration
 
 First decide which system owns the colors. Do not generate configuration when the program can inherit the palette from an existing themed parent, such as a terminal. If another theme manager owns the program, integrate with that manager rather than overriding its output.
@@ -84,6 +101,7 @@ XDG_CONFIG_HOME="$PWD/home/.config" \
 XDG_STATE_HOME="$tmp/state" \
 DOTFILES_THEME_OMARCHY_HOOK=1 \
 DOTFILES_THEME_NO_RELOAD=1 \
+DOTFILES_THEME_NO_APPEARANCE=1 \
   ./home/.local/bin/dotfiles-theme set gruvbox
 
 ls -1 "$tmp/state/dotfiles/theme/current"

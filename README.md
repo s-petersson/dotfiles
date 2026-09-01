@@ -70,7 +70,7 @@ dot theme choose
 dot theme set gruvbox
 ```
 
-On Omarchy, selections from the native theme switcher use the same rendering flow. See [`docs/theming.md`](docs/theming.md) for the palette format, rendering model, and integration contract.
+On Omarchy, selections from the native theme switcher use the same rendering flow. On macOS, selecting a theme also sets the matching light or dark system appearance, and system appearance changes restore the last theme used for that mode. See [`docs/theming.md`](docs/theming.md) for the palette format, rendering model, and integration contract.
 
 ## Setup scripts
 
