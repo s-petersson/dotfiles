@@ -1,0 +1,121 @@
+#!/bin/sh
+set -eu
+
+config_home=${XDG_CONFIG_HOME:-"$HOME/.config"}
+state_home=${XDG_STATE_HOME:-"$HOME/.local/state"}
+config="$config_home/dotfiles/macos-appearance.conf"
+state_dir="$state_home/dotfiles/theme/macos-appearance"
+theme_command="$HOME/.local/bin/dotfiles-theme"
+
+usage() {
+  echo "usage: dotfiles-macos-appearance <sync|apply THEME MODE>" >&2
+}
+
+current_mode() {
+  if [ "$(defaults read -g AppleInterfaceStyle 2>/dev/null || true)" = Dark ]; then
+    echo dark
+  else
+    echo light
+  fi
+}
+
+preferred_theme() {
+  mode=$1
+  state_file="$state_dir/$mode.name"
+
+  if [ -s "$state_file" ]; then
+    cat "$state_file"
+    return
+  fi
+
+  dark_theme=
+  light_theme=
+  [ -r "$config" ] || {
+    echo "Missing macOS appearance theme mapping: $config" >&2
+    return 1
+  }
+  . "$config"
+
+  case $mode in
+    dark) theme=$dark_theme ;;
+    light) theme=$light_theme ;;
+  esac
+  [ -n "$theme" ] || {
+    echo "No default theme configured for macOS $mode appearance" >&2
+    return 1
+  }
+  printf '%s\n' "$theme"
+}
+
+remember_theme() {
+  theme=$1
+  mode=$2
+  temporary="$state_dir/.$mode.$$"
+
+  mkdir -p "$state_dir"
+  printf '%s\n' "$theme" >"$temporary"
+  mv -f "$temporary" "$state_dir/$mode.name"
+}
+
+set_mode() {
+  mode=$1
+  [ "$(current_mode)" = "$mode" ] && return
+
+  case $mode in
+    dark) enabled=true ;;
+    light) enabled=false ;;
+  esac
+
+  osascript \
+    -e 'tell application "System Events"' \
+    -e "tell appearance preferences to set dark mode to $enabled" \
+    -e 'end tell' >/dev/null
+}
+
+sync_appearance() {
+  mode=$(current_mode)
+  theme=$(preferred_theme "$mode")
+  current=$("$theme_command" current 2>/dev/null || true)
+
+  [ "$current" = "$theme" ] || "$theme_command" set "$theme"
+}
+
+apply_theme() {
+  [ "$#" -eq 2 ] || {
+    usage
+    return 2
+  }
+  theme=$1
+  mode=$2
+
+  case $mode in
+    dark | light) ;;
+    *)
+      echo "Invalid theme mode: $mode" >&2
+      return 2
+      ;;
+  esac
+  [ -n "$theme" ] || {
+    echo "Invalid empty theme name" >&2
+    return 2
+  }
+
+  remember_theme "$theme" "$mode"
+  set_mode "$mode"
+}
+
+command=${1:-}
+case $command in
+  sync)
+    [ "$#" -eq 1 ] || { usage; exit 2; }
+    sync_appearance
+    ;;
+  apply)
+    shift
+    apply_theme "$@"
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac

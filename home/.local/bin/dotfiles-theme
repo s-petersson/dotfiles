@@ -240,6 +240,10 @@ apply_theme() {
   if [ "${DOTFILES_THEME_NO_RELOAD:-0}" != 1 ]; then
     reload_apps
   fi
+  appearance_command="$HOME/.local/bin/dotfiles-macos-appearance"
+  if [ "$(uname -s)" = Darwin ] && [ "${DOTFILES_THEME_NO_APPEARANCE:-0}" != 1 ] && [ -x "$appearance_command" ]; then
+    "$appearance_command" apply "$theme" "$mode"
+  fi
   printf 'Applied theme: %s\n' "$theme"
 }
 
