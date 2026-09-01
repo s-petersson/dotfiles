@@ -74,7 +74,7 @@ light_theme=gruvbox-light
 
 Manual theme selections replace the remembered choice for their mode in runtime state. The tracked configuration remains the fallback for a new installation.
 
-A LaunchAgent runs a small Swift notification listener from source. It listens for `AppleInterfaceThemeChangedNotification` and calls `dotfiles-macos-appearance sync`. It does not require a repository build step. `post/45-start-macos-theme-listener.sh` loads the agent after stow.
+A LaunchAgent runs a small Swift notification listener from source. It listens for `AppleInterfaceThemeChangedNotification` and calls `dotfiles-macos-appearance sync`. An in-process timer also checks the system mode and recovers from notifications missed by System Settings. It only runs the sync command when the mode changes. The listener does not require a repository build step. `post/45-start-macos-theme-listener.sh` loads the agent after stow.
 
 ## Adding an integration
 

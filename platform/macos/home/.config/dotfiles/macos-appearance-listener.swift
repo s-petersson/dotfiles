@@ -1,6 +1,14 @@
 import Foundation
 
+func currentMode() -> String {
+    UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? "dark" : "light"
+}
+
+var lastMode = currentMode()
+
 func syncTheme() {
+    lastMode = currentMode()
+
     let process = Process()
     process.executableURL = URL(fileURLWithPath: "/bin/sh")
     process.arguments = ["-lc", "exec \"$HOME/.local/bin/dotfiles-macos-appearance\" sync"]
@@ -24,6 +32,13 @@ let observer = center.addObserver(
 
 syncTheme()
 
-withExtendedLifetime(observer) {
+let timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
+    let mode = currentMode()
+    if mode != lastMode {
+        syncTheme()
+    }
+}
+
+withExtendedLifetime((observer, timer)) {
     RunLoop.main.run()
 }
