@@ -8,7 +8,7 @@
     <array>
         <string>/bin/sh</string>
         <string>-lc</string>
-        <string>exec /usr/bin/swift "$HOME/.config/dotfiles/macos-appearance-listener.swift"</string>
+        <string>exec "$HOME/.local/bin/dotfiles-macos-appearance" watch</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

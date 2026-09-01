@@ -8,7 +8,7 @@ state_dir="$state_home/dotfiles/theme/macos-appearance"
 theme_command="$HOME/.local/bin/dotfiles-theme"
 
 usage() {
-  echo "usage: dotfiles-macos-appearance <sync|apply THEME MODE>" >&2
+  echo "usage: dotfiles-macos-appearance <watch|sync|apply THEME MODE>" >&2
 }
 
 current_mode() {
@@ -73,11 +73,24 @@ set_mode() {
 }
 
 sync_appearance() {
-  mode=$(current_mode)
+  mode=${1:-}
+  [ -n "$mode" ] || mode=$(current_mode)
   theme=$(preferred_theme "$mode")
   current=$("$theme_command" current 2>/dev/null || true)
 
   [ "$current" = "$theme" ] || "$theme_command" set "$theme"
+}
+
+watch_appearance() {
+  previous=
+  while :; do
+    mode=$(current_mode)
+    if [ "$mode" != "$previous" ]; then
+      previous=$mode
+      sync_appearance "$mode"
+    fi
+    sleep 1
+  done
 }
 
 apply_theme() {
@@ -106,6 +119,10 @@ apply_theme() {
 
 command=${1:-}
 case $command in
+  watch)
+    [ "$#" -eq 1 ] || { usage; exit 2; }
+    watch_appearance
+    ;;
   sync)
     [ "$#" -eq 1 ] || { usage; exit 2; }
     sync_appearance
