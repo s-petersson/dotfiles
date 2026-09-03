@@ -71,6 +71,7 @@ function M.reload()
 
     vim.o.background = theme.mode
     M.mocha = theme.colors
+    M.latte = theme.colors
     return true
 end
 

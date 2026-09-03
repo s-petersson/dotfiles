@@ -1,7 +1,7 @@
 local COLORS = require('spetersson.utils.colors')
 
 require('catppuccin').setup({
-    flavour = 'mocha',
+    flavour = 'auto',
     background = {
         light = 'latte',
         dark = 'mocha',
