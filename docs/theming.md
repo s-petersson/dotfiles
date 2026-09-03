@@ -1,6 +1,6 @@
 # Theming
 
-The theme system turns one semantic color palette into configuration for anything that needs it. Theme definitions are tracked in the repository. Generated configuration is runtime state and is not committed.
+The theme system maps each theme's native colors onto shared UI roles and a terminal palette, then renders configuration for anything that needs it. Theme definitions are tracked in the repository. Generated configuration is runtime state and is not committed.
 
 The flow is:
 
@@ -27,8 +27,8 @@ Generated files live under `~/.local/state/dotfiles/theme/current/`. Do not stow
 
 ## Sources of truth
 
-- `home/.config/dotfiles/themes/<slug>/colors.toml` defines a complete semantic palette.
-- `home/.config/dotfiles/theme-templates/<output>.tpl` maps that palette to a configuration format.
+- `home/.config/dotfiles/themes/<slug>/colors.toml` defines the native palette, shared roles, and ANSI terminal colors.
+- `home/.config/dotfiles/theme-templates/<output>.tpl` maps roles or terminal colors to a configuration format.
 - `home/.local/bin/dotfiles-theme` validates palettes, renders templates, activates a generation, and reloads consumers.
 - `home/.config/omarchy/themes/<slug>` makes a tracked theme available to Omarchy.
 - `home/.config/omarchy/hooks/theme-set.d/dotfiles-theme` synchronizes Omarchy selections.
@@ -40,21 +40,55 @@ The renderer can also use the active Omarchy theme's `colors.toml`. This lets un
 
 ## Palette contract
 
-Templates use semantic names instead of theme-specific color values. Every tracked theme must set `mode` to `dark` or `light` and define these six-digit hex colors:
+Every tracked theme sets `mode` to `dark` or `light` and has three tables. Themes linked into `~/.config/omarchy/themes/` also retain Omarchy's flat root keys as a compatibility projection:
 
-```text
-accent selection muted
-background dark_background darker_background lighter_background
-foreground dark_foreground light_foreground bright_foreground
-red yellow orange green cyan blue magenta brown
-bright_red bright_yellow bright_green bright_cyan bright_blue bright_magenta
+- `[colors]` preserves the theme's native, named palette. Values are six-digit hex colors.
+- `[roles]` maps shared visual purposes to names in `[colors]`.
+- `[terminal]` maps the sixteen ANSI colors to names in `[colors]`.
+
+A role or terminal mapping is a color name, not a copied hex value:
+
+```toml
+mode = "dark"
+
+[colors]
+base = "#1e1e2e"
+surface0 = "#313244"
+blue = "#89b4fa"
+
+[roles]
+background = "base"
+surface = "surface0"
+accent = "blue"
+
+[terminal]
+blue = "blue"
 ```
 
-The format is compatible with Omarchy's semantic `colors.toml`. Keep tracked themes complete rather than relying on files from `/usr/share/omarchy`.
+The shared role contract is:
+
+```text
+background background_secondary background_tertiary
+surface surface_secondary surface_tertiary selection
+overlay overlay_secondary overlay_tertiary
+foreground_muted foreground_subtle foreground
+accent accent_soft accent_warm
+error error_muted warning success
+info_muted info_bright info_soft
+syntax_attribute syntax_constant syntax_operator syntax_string
+```
+
+The terminal contract is the ANSI names `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, and `white`, plus each `bright_` variant.
+
+Role names describe purpose rather than luminance. For example, a light theme can make `surface_secondary` darker than `surface`, while a dark theme can make it lighter. Themes with smaller palettes may map several roles to the same native color. Add a role only when an application needs a new visual purpose; unused native colors remain in `[colors]` without becoming roles.
+
+Templates use roles such as `{{ background }}`. Only terminal configuration uses tokens such as `{{ terminal_blue }}`. Templates do not use names from `[colors]`, which are intentionally theme-specific.
+
+The renderer uses the structured tables when they are present. It also accepts an external Omarchy theme containing only the flat semantic format and converts it to the shared contract. Omarchy itself uses the flat compatibility projection in tracked themes.
 
 To add a theme:
 
-1. Add `home/.config/dotfiles/themes/<slug>/colors.toml` with the complete palette.
+1. Add `home/.config/dotfiles/themes/<slug>/colors.toml` with all three tables and the complete contract.
 2. If Omarchy should list it, add a relative link at `home/.config/omarchy/themes/<slug>` pointing to `../../dotfiles/themes/<slug>`.
 3. Run `dotfiles-theme set <slug>` to validate and select it.
 4. On Omarchy, run `omarchy theme set <slug>` and confirm the native switcher lists it.
@@ -82,13 +116,13 @@ First decide which system owns the colors. Do not generate configuration when th
 
 When generated configuration is needed:
 
-1. Add `home/.config/dotfiles/theme-templates/<output>.tpl`. Use palette tokens such as `{{ background }}`.
+1. Add `home/.config/dotfiles/theme-templates/<output>.tpl`. Use role tokens such as `{{ background }}`, or `{{ terminal_blue }}` when configuring an ANSI palette.
 2. Make the program's static configuration load `~/.local/state/dotfiles/theme/current/<output>`. Keep settings unrelated to color in the static configuration.
 3. If the program does not watch that file, add the smallest safe reload action to `reload_apps` in `home/.local/bin/dotfiles-theme`.
 4. Apply every tracked theme and check each generated file for unresolved `{{ ... }}` tokens.
 5. Test an existing process and a newly started process on every supported platform.
 
-This is the whole integration contract: a semantic palette, a small format adapter, a stable runtime path, and an optional reload action.
+This is the whole integration contract: shared roles, a small format adapter, a stable runtime path, and an optional reload action.
 
 ## Verification
 

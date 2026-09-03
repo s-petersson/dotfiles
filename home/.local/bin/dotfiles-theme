@@ -74,14 +74,20 @@ theme_source() {
   fi
 }
 
-theme_value() {
-  key=$1
-  file=$2
-  awk -F= -v wanted="$key" '
-    {
+table_value() {
+  section=$1
+  key=$2
+  file=$3
+  awk -F= -v wanted_section="$section" -v wanted_key="$key" '
+    /^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
+      current = $0
+      gsub(/^[[:space:]]*\[|\][[:space:]]*$/, "", current)
+      next
+    }
+    current == wanted_section {
       name = $1
       gsub(/^[[:space:]]+|[[:space:]]+$/, "", name)
-      if (name != wanted) next
+      if (name != wanted_key) next
 
       value = substr($0, index($0, "=") + 1)
       gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
@@ -94,12 +100,107 @@ theme_value() {
   ' "$file"
 }
 
+table_keys() {
+  section=$1
+  file=$2
+  awk -F= -v wanted_section="$section" '
+    /^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
+      current = $0
+      gsub(/^[[:space:]]*\[|\][[:space:]]*$/, "", current)
+      next
+    }
+    current == wanted_section && index($0, "=") {
+      name = $1
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", name)
+      print name
+    }
+  ' "$file"
+}
+
+validate_color() {
+  key=$1
+  value=$2
+  case $value in
+    \#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]) ;;
+    *)
+      echo "Theme color '$key' is not a six-digit hex color: $value" >&2
+      return 1
+      ;;
+  esac
+}
+
+resolved_color() {
+  section=$1
+  key=$2
+  file=$3
+  reference=$(table_value "$section" "$key" "$file") || {
+    echo "Theme is missing required mapping '$section.$key': $file" >&2
+    return 1
+  }
+  value=$(table_value colors "$reference" "$file") || {
+    echo "Theme mapping '$section.$key' references unknown color '$reference': $file" >&2
+    return 1
+  }
+  validate_color "colors.$reference" "$value" || return 1
+  printf '%s\n' "$value"
+}
+
+legacy_color() {
+  key=$1
+  file=$2
+  value=$(table_value '' "$key" "$file") || {
+    case $key in
+      orange) value=$(table_value '' red "$file") ;;
+      brown) value=$(table_value '' dark_foreground "$file") ;;
+      *) return 1 ;;
+    esac
+  }
+  validate_color "$key" "$value" || return 1
+  printf '%s\n' "$value"
+}
+
+legacy_role_key() {
+  case $1 in
+    background) echo background ;;
+    background_secondary) echo dark_background ;;
+    background_tertiary) echo darker_background ;;
+    surface) echo lighter_background ;;
+    selection | surface_secondary) echo selection ;;
+    surface_tertiary | overlay) echo muted ;;
+    overlay_secondary | foreground_muted) echo dark_foreground ;;
+    overlay_tertiary | foreground_subtle) echo light_foreground ;;
+    foreground) echo foreground ;;
+    accent) echo accent ;;
+    accent_soft | syntax_operator) echo orange ;;
+    accent_warm | error | error_muted) echo red ;;
+    warning) echo yellow ;;
+    success) echo green ;;
+    info_muted | syntax_string) echo cyan ;;
+    info_bright) echo bright_cyan ;;
+    info_soft) echo bright_blue ;;
+    syntax_attribute) echo bright_magenta ;;
+    syntax_constant) echo magenta ;;
+  esac
+}
+
+legacy_terminal_key() {
+  case $1 in
+    black) echo background ;;
+    red | green | yellow | blue | magenta | cyan) echo "$1" ;;
+    white) echo foreground ;;
+    bright_black) echo muted ;;
+    bright_red | bright_green | bright_yellow | bright_blue | bright_magenta | bright_cyan) echo "$1" ;;
+    bright_white) echo bright_foreground ;;
+  esac
+}
+
 build_palette() {
   source_file=$1
   output=$2
-  keys='accent selection muted background dark_background darker_background lighter_background foreground dark_foreground light_foreground bright_foreground red yellow orange green cyan blue magenta brown bright_red bright_yellow bright_green bright_cyan bright_blue bright_magenta'
+  role_keys='background background_secondary background_tertiary surface surface_secondary surface_tertiary selection overlay overlay_secondary overlay_tertiary foreground_muted foreground_subtle foreground accent accent_soft accent_warm error error_muted warning success info_muted info_bright info_soft syntax_attribute syntax_constant syntax_operator syntax_string'
+  terminal_keys='black red green yellow blue magenta cyan white bright_black bright_red bright_green bright_yellow bright_blue bright_magenta bright_cyan bright_white'
 
-  mode=$(theme_value mode "$source_file") || {
+  mode=$(table_value '' mode "$source_file") || {
     echo "Theme is missing required value 'mode': $source_file" >&2
     return 1
   }
@@ -112,25 +213,42 @@ build_palette() {
   esac
 
   printf 'mode\t%s\n' "$mode" >"$output"
-  for key in $keys; do
-    if ! value=$(theme_value "$key" "$source_file"); then
-      case $key in
-        orange) value=$(theme_value red "$source_file") ;;
-        brown) value=$(theme_value dark_foreground "$source_file") ;;
-        *)
-          echo "Theme is missing required color '$key': $source_file" >&2
-          return 1
-          ;;
-      esac
-    fi
-    case $value in
-      \#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]) ;;
-      *)
-        echo "Theme color '$key' is not a six-digit hex color: $value" >&2
-        return 1
-        ;;
-    esac
+  if grep -q '^[[:space:]]*\[colors\][[:space:]]*$' "$source_file"; then
+    color_keys=$(table_keys colors "$source_file")
+    [ -n "$color_keys" ] || {
+      echo "Theme has an empty colors table: $source_file" >&2
+      return 1
+    }
+    for key in $color_keys; do
+      value=$(table_value colors "$key" "$source_file")
+      validate_color "colors.$key" "$value" || return 1
+    done
+    for key in $role_keys; do
+      value=$(resolved_color roles "$key" "$source_file") || return 1
+      printf '%s\t%s\n' "$key" "$value" >>"$output"
+    done
+    for key in $terminal_keys; do
+      value=$(resolved_color terminal "$key" "$source_file") || return 1
+      printf 'terminal_%s\t%s\n' "$key" "$value" >>"$output"
+    done
+    return
+  fi
+
+  for key in $role_keys; do
+    legacy_key=$(legacy_role_key "$key")
+    value=$(legacy_color "$legacy_key" "$source_file") || {
+      echo "Theme is missing required color '$legacy_key': $source_file" >&2
+      return 1
+    }
     printf '%s\t%s\n' "$key" "$value" >>"$output"
+  done
+  for key in $terminal_keys; do
+    legacy_key=$(legacy_terminal_key "$key")
+    value=$(legacy_color "$legacy_key" "$source_file") || {
+      echo "Theme is missing required color '$legacy_key': $source_file" >&2
+      return 1
+    }
+    printf 'terminal_%s\t%s\n' "$key" "$value" >>"$output"
   done
 }
 
