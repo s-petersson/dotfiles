@@ -63,5 +63,6 @@ bindkey '\e[1;5D' backward-word # Ctrl+Left
 bindkey '\e[1;5C' forward-word # Ctrl+Right
 bindkey '\e[Z' reverse-menu-complete # Shift+Tab
 
-export PLANNOTATOR_AI=disabled
-export PLANNOTATOR_SHARE=disabled
+source $HOME/.zprofile-private
+source $HOME/.zshrc-private
+
