@@ -1,13 +1,37 @@
 #!/usr/bin/env bash
-# Toggle a macOS app by bundle id:
-#   focused -> hide it (macOS returns focus to the previous window)
-#   else    -> launch or focus it
+# Toggle one app window through an invisible AeroSpace workspace.
 set -euo pipefail
 
 bundle_id="${1:?usage: aerospace-toggle-app <bundle-id>}"
+parking_workspace="toggle-$bundle_id"
 
-if [[ "$(aerospace list-windows --focused --format '%{app-bundle-id}')" == "$bundle_id" ]]; then
-  osascript -e "tell application \"System Events\" to set visible of (first process whose bundle identifier is \"$bundle_id\") to false"
-else
+focused_window="$(aerospace list-windows --focused --format '%{window-id}%{tab}%{app-bundle-id}' 2>/dev/null || true)"
+IFS=$'\t' read -r focused_id focused_bundle_id <<< "$focused_window"
+
+if [[ "$focused_bundle_id" == "$bundle_id" ]]; then
+  aerospace move-node-to-workspace --window-id "$focused_id" "$parking_workspace"
+  exit
+fi
+
+windows="$(aerospace list-windows --monitor all --app-bundle-id "$bundle_id" --format '%{window-id}%{tab}%{workspace}')"
+if [[ -z "$windows" ]]; then
   open -b "$bundle_id"
+  exit
+fi
+
+target_id=""
+target_workspace=""
+while IFS=$'\t' read -r window_id workspace; do
+  if [[ -z "$target_id" || "$workspace" == "$parking_workspace" ]]; then
+    target_id="$window_id"
+    target_workspace="$workspace"
+  fi
+  [[ "$workspace" == "$parking_workspace" ]] && break
+done <<< "$windows"
+
+current_workspace="$(aerospace list-workspaces --focused --format '%{workspace}')"
+if [[ "$target_workspace" == "$current_workspace" ]]; then
+  aerospace focus --window-id "$target_id"
+else
+  aerospace move-node-to-workspace --focus-follows-window --window-id "$target_id" "$current_workspace"
 fi
