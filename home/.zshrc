@@ -63,6 +63,6 @@ bindkey '\e[1;5D' backward-word # Ctrl+Left
 bindkey '\e[1;5C' forward-word # Ctrl+Right
 bindkey '\e[Z' reverse-menu-complete # Shift+Tab
 
-source $HOME/.zprofile-private
-source $HOME/.zshrc-private
+[[ -f "$HOME/.zprofile-private" ]] && source "$HOME/.zprofile-private"
+[[ -f "$HOME/.zshrc-private" ]] && source "$HOME/.zshrc-private"
 
