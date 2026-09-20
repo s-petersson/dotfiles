@@ -27,7 +27,8 @@ Generated files live under `~/.local/state/dotfiles/theme/current/`. Do not stow
 
 ## Sources of truth
 
-- `home/.config/dotfiles/themes/<slug>/colors.toml` defines the native palette, shared roles, and ANSI terminal colors.
+- `home/.config/dotfiles/themes/<slug>/palette.toml` defines the native palette, shared roles, and ANSI terminal colors.
+- `home/.config/dotfiles/themes/<slug>/colors.toml` is the flat compatibility palette consumed by Omarchy.
 - `home/.config/dotfiles/theme-templates/<output>.tpl` maps roles or terminal colors to a configuration format.
 - `home/.local/bin/dotfiles-theme` validates palettes, renders templates, activates a generation, and reloads consumers.
 - `home/.config/omarchy/themes/<slug>` makes a tracked theme available to Omarchy.
@@ -40,11 +41,13 @@ The renderer can also use the active Omarchy theme's `colors.toml`. This lets un
 
 ## Palette contract
 
-Every tracked theme sets `mode` to `dark` or `light` and has three tables. Themes linked into `~/.config/omarchy/themes/` also retain Omarchy's flat root keys as a compatibility projection:
+Every tracked `palette.toml` sets `mode` to `dark` or `light` and has three tables:
 
 - `[colors]` preserves the theme's native, named palette. Values are six-digit hex colors.
 - `[roles]` maps shared visual purposes to names in `[colors]`.
 - `[terminal]` maps the sixteen ANSI colors to names in `[colors]`.
+
+Each tracked theme also has a flat `colors.toml` with Omarchy's semantic keys. Omarchy does not parse TOML tables, so the structured palette and flat compatibility palette must remain separate.
 
 A role or terminal mapping is a color name, not a copied hex value:
 
@@ -84,16 +87,17 @@ Role names describe purpose rather than luminance. For example, a light theme ca
 
 Templates use roles such as `{{ background }}`. Only terminal configuration uses tokens such as `{{ terminal_blue }}`. Templates do not use names from `[colors]`, which are intentionally theme-specific.
 
-The renderer uses the structured tables when they are present. It also accepts an external Omarchy theme containing only the flat semantic format and converts it to the shared contract. Omarchy itself uses the flat compatibility projection in tracked themes.
+The renderer uses `palette.toml` for tracked themes. It also accepts an external Omarchy theme containing only the flat semantic format and converts it to the shared contract. Omarchy itself uses the flat `colors.toml` in tracked themes.
 
 To add a theme:
 
-1. Add `home/.config/dotfiles/themes/<slug>/colors.toml` with all three tables and the complete contract.
-2. If Omarchy should list it, add a relative link at `home/.config/omarchy/themes/<slug>` pointing to `../../dotfiles/themes/<slug>`.
-3. Run `dotfiles-theme set <slug>` to validate and select it.
-4. On Omarchy, run `omarchy theme set <slug>` and confirm the native switcher lists it.
+1. Add `home/.config/dotfiles/themes/<slug>/palette.toml` with all three tables and the complete contract.
+2. Add a flat Omarchy-compatible `home/.config/dotfiles/themes/<slug>/colors.toml`.
+3. If Omarchy should list it, add a relative link at `home/.config/omarchy/themes/<slug>` pointing to `../../dotfiles/themes/<slug>`.
+4. Run `dotfiles-theme set <slug>` to validate and select it.
+5. On Omarchy, run `omarchy theme set <slug>` and confirm the native switcher lists it.
 
-A tracked theme may also contain a `backgrounds/` directory for platform-specific consumers. The portable renderer only reads `colors.toml`.
+A tracked theme may also contain a `backgrounds/` directory for platform-specific consumers. The portable renderer only reads `palette.toml`.
 
 ## macOS appearance
 

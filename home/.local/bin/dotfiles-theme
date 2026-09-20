@@ -54,7 +54,7 @@ current_theme() {
 
 theme_source() {
   theme=$1
-  repo_theme="$themes_dir/$theme/colors.toml"
+  repo_theme="$themes_dir/$theme/palette.toml"
   user_omarchy_theme="$config_home/omarchy/themes/$theme/colors.toml"
   stock_omarchy_theme="${OMARCHY_PATH:-/usr/share/omarchy}/themes/$theme/colors.toml"
   current_omarchy_theme="$state_home/omarchy/current/theme/colors.toml"
