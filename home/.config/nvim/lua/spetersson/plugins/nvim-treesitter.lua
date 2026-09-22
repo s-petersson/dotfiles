@@ -15,6 +15,7 @@ local PARSERS = {
     'javascript',
     'python',
     'yaml',
+    'hcl',
 }
 
 ---@param buf integer
