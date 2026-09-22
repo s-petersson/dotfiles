@@ -7,6 +7,8 @@ require('oil').setup({
     },
     keymaps = {
         ['q'] = 'actions.close',
+        ['<C-v>'] = { 'actions.select', opts = { vertical = true } },
+        ['<C-s>'] = { 'actions.select', opts = { horizontal = true } },
     },
     view_options = {
         show_hidden = true,

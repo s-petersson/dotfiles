@@ -352,20 +352,7 @@ end
 
 function M.oil()
     local oil = require('oil')
-    local last_dir = nil
-
-    vim.api.nvim_create_autocmd('BufLeave', {
-        pattern = 'oil://*',
-        callback = function() last_dir = oil.get_current_dir() end,
-    })
-
     map('n', '<leader>e', function() oil.toggle_float() end, { desc = 'Open Oil file [e]xplorer' })
-    map(
-        'n',
-        '<leader>E',
-        function() oil.open_float(last_dir) end,
-        { desc = 'Open Oil at last opened folder' }
-    )
 end
 
 return M
