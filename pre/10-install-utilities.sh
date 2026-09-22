@@ -10,6 +10,8 @@ dotfiles_install_packages \
     stow \
     fzf \
     neovim \
+    tree-sitter \
+    tree-sitter-cli \
     starship \
     zoxide \
     fnm \
