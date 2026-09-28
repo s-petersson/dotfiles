@@ -1,14 +1,6 @@
 {
   "tuiMode": "fullscreen",
   "theme": "dotfiles",
-  "themes": [
-    "~/.local/state/dotfiles/theme/current/pi.json"
-  ],
-  "defaultModel": "claude-opus-5",
-  "defaultThinkingLevel": "medium",
-  "defaultProvider": "anthropic",
-  "lastChangelogVersion": "0.84.4",
-  "packages": [
-    "npm:@plannotator/pi-extension"
-  ]
+  "themes": ["~/.local/state/dotfiles/theme/current/pi.json"],
+  "packages": []
 }
