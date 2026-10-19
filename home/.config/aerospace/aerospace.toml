@@ -12,10 +12,10 @@ on-focused-monitor-changed = ["move-mouse monitor-lazy-center"]
 
 gaps.inner.horizontal = 8
 gaps.inner.vertical = 8
-gaps.outer.left = 8
-gaps.outer.bottom = 8
-gaps.outer.top = 6
-gaps.outer.right = 8
+gaps.outer.left = 16
+gaps.outer.bottom = 16
+gaps.outer.top = 16
+gaps.outer.right = 16
 
 # Named workspaces (see keybindings below):
 #   code
