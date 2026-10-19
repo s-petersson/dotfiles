@@ -1,6 +1,7 @@
 {
   "tuiMode": "fullscreen",
   "theme": "dotfiles",
+  "lastChangelogVersion": "1.3.0",
   "themes": ["~/.local/state/dotfiles/theme/current/pi.json"],
   "packages": []
 }
