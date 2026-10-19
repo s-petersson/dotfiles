@@ -27,4 +27,5 @@ dotfiles_install_packages \
 dotfiles_install_homebrew_casks \
     ghostty \
     nikitabobko/tap/aerospace \
-    obsidian
+    obsidian \
+    t3-code
