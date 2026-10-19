@@ -169,10 +169,22 @@ export default function (pi: ExtensionAPI) {
 
   const sessionCost = (ctx: ExtensionContext): number => {
     let cost = 0;
-    for (const entry of ctx.sessionManager.getBranch()) {
-      if (entry.type !== "message") continue;
-      if (entry.message.role !== "assistant") continue;
-      cost += entry.message.usage.cost.total;
+    for (const entry of ctx.sessionManager.getEntries()) {
+      if (entry.type === "usage") {
+        cost += entry.usage.cost.total;
+      } else if (
+        entry.type === "compaction" ||
+        entry.type === "branch_summary"
+      ) {
+        cost += entry.usage?.cost.total ?? 0;
+      } else if (entry.type === "message") {
+        if (
+          entry.message.role === "assistant" ||
+          entry.message.role === "toolResult"
+        ) {
+          cost += entry.message.usage?.cost.total ?? 0;
+        }
+      }
     }
     return cost;
   };
