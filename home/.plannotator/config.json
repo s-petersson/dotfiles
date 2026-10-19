@@ -6,7 +6,11 @@
     "diffIndicators": "bars",
     "overflow": "wrap",
     "lineBgIntensity": "subtle",
-    "lineDiffType": "word-alt"
+    "lineDiffType": "word-alt",
+    "showLineNumbers": true,
+    "showDiffBackground": true,
+    "expandUnchanged": false,
+    "tabSize": 2
   },
   "displayName": "spetersson",
   "prompts": {
@@ -21,6 +25,7 @@
   "theme": {
     "mode": "system",
     "light": "plannotator",
-    "dark": "plannotator"
-  }
+    "dark": "caffeine"
+  },
+  "favicon": "classic"
 }
